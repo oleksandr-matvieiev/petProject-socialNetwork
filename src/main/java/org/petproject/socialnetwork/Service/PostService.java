@@ -1,7 +1,9 @@
 package org.petproject.socialnetwork.Service;
 
+import org.petproject.socialnetwork.DTO.PostDTO;
 import org.petproject.socialnetwork.Exceptions.ErrorMessages;
 import org.petproject.socialnetwork.Exceptions.PostNotFound;
+import org.petproject.socialnetwork.Mapper.PostMapper;
 import org.petproject.socialnetwork.Model.Post;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.PostRepository;
@@ -11,17 +13,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final PostMapper postMapper;
     private final Logger logger = LoggerFactory.getLogger(PostService.class);
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper) {
         this.postRepository = postRepository;
+        this.postMapper = postMapper;
     }
 
-    public Post createPost(User user, String content) {
+    public PostDTO createPost(User user, String content) {
         if (user == null) {
             logger.error("Attempt to create post with null user.");
             throw new IllegalArgumentException("User cannot be null.");
@@ -34,9 +39,7 @@ public class PostService {
         Post post = new Post();
         post.setUser(user);
         post.setContent(content);
-        Post savedPost = postRepository.save(post);
-        logger.info("Post created for user: {}", user.getUsername());
-        return savedPost;
+        return postMapper.toDTO(postRepository.save(post));
     }
 
     @Transactional
@@ -47,6 +50,12 @@ public class PostService {
         }
         postRepository.deleteById(postId);
         logger.info("Post with ID: {} successfully deleted.", postId);
+    }
+
+    public List<PostDTO> getPostsByUser(User user) {
+        return postRepository.findByUser(user).stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
 

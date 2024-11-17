@@ -1,6 +1,8 @@
 package org.petproject.socialnetwork.Service;
 
+import org.petproject.socialnetwork.DTO.FollowDTO;
 import org.petproject.socialnetwork.Exceptions.ErrorMessages;
+import org.petproject.socialnetwork.Mapper.FollowMapper;
 import org.petproject.socialnetwork.Model.Follow;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.FollowRepository;
@@ -8,16 +10,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class FollowService {
     private final FollowRepository followRepository;
+    private final FollowMapper followMapper;
     private final Logger logger = LoggerFactory.getLogger(FollowService.class);
 
-    public FollowService(FollowRepository followRepository) {
+    public FollowService(FollowRepository followRepository, FollowMapper followMapper) {
         this.followRepository = followRepository;
+        this.followMapper = followMapper;
     }
 
-    public void followUser(User follower, User followee) {
+    public FollowDTO followUser(User follower, User followee) {
         if (follower == null || followee == null) {
             logger.error("Follower or followee is null.");
             throw new IllegalArgumentException("Follower and followee cannot be null.");
@@ -34,8 +41,19 @@ public class FollowService {
         Follow follow = new Follow();
         follow.setFollower(follower);
         follow.setFollowee(followee);
-        followRepository.save(follow);
-
         logger.info("User {} successfully followed user {}.", follower.getUsername(), followee.getUsername());
+        return followMapper.toDTO(followRepository.save(follow));
+    }
+
+    public List<FollowDTO> getFollowers(User user) {
+        return followRepository.findByFollowee(user).stream()
+                .map(followMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<FollowDTO> getFollowees(User user) {
+        return followRepository.findByFollower(user).stream()
+                .map(followMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

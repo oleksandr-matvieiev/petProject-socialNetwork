@@ -1,6 +1,8 @@
 package org.petproject.socialnetwork.Service;
 
+import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Exceptions.UserNotFound;
+import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.slf4j.Logger;
@@ -12,28 +14,25 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+    private final UserMapper userMapper;
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(UserRepository userRepository, PasswordEncoder encoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder encoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.encoder = encoder;
+        this.userMapper = userMapper;
     }
 
-    public User findUserByUsernameOrThrow(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    logger.error("User not found.");
-                    return new UserNotFound();
-                });
+    public UserDTO findUserByUsernameOrThrow(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFound("User not found."));
+        return userMapper.toDTO(user);
     }
 
-    public User findUserByEmail(String email) {
-
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    logger.error("User not found.");
-                    return new UserNotFound();
-                });
+    public UserDTO findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFound("User not found."));
+        return userMapper.toDTO(user);
     }
 
     public void changePassword(User user, String newPassword) {
@@ -41,9 +40,9 @@ public class UserService {
             logger.error("Try to change password with null input");
             throw new IllegalArgumentException("User or new password cannot be null/empty.");
         }
-        user.setPassword(newPassword);
+        user.setPassword(encoder.encode(newPassword));
         logger.info("User: {} change password", user.getUsername());
-        userRepository.save(user);
+        userMapper.toDTO(userRepository.save(user));
     }
 
 

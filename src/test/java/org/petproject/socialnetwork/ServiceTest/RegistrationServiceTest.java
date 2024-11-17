@@ -5,11 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Exceptions.UserAlreadyExists;
 import org.petproject.socialnetwork.Exceptions.UserWithEmailAlreadyExists;
+import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.petproject.socialnetwork.Service.RegistrationService;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -23,6 +26,8 @@ public class RegistrationServiceTest {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserMapper userMapper;
     @InjectMocks
     private RegistrationService registrationService;
 
@@ -37,26 +42,34 @@ public class RegistrationServiceTest {
         String email = "test@example.com";
         String password = "testPass";
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.existsByUsername(username)).thenReturn(false);
+        when(userRepository.existsByEmail(email)).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn("encodedPassword");
 
         User savedUser = new User();
+        savedUser.setId(1L);
         savedUser.setUsername(username);
         savedUser.setEmail(email);
         savedUser.setPassword("encodedPassword");
 
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-        User result = registrationService.registerUser(username, email, password);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(username);
+        userDTO.setEmail(email);
+
+        when(userMapper.toDTO(savedUser)).thenReturn(userDTO);
+        when(userMapper.toEntity(userDTO)).thenReturn(savedUser);
+
+        UserDTO result = registrationService.registerUser(username, email, password);
 
         assertNotNull(result);
         assertEquals(username, result.getUsername());
         assertEquals(email, result.getEmail());
-        assertEquals("encodedPassword", result.getPassword());
 
         verify(userRepository, times(1)).save(any(User.class));
     }
+
 
     @Test
     void registerUser_UsernameAlreadyExists() {

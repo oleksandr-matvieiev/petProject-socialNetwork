@@ -5,9 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.petproject.socialnetwork.DTO.PostDTO;
+import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Exceptions.PostNotFound;
+import org.petproject.socialnetwork.Mapper.PostMapper;
+import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.Post;
-import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.PostRepository;
 import org.petproject.socialnetwork.Service.PostService;
 
@@ -15,9 +18,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class PostServiceTest {
+class PostServiceTest {
+
     @Mock
     private PostRepository postRepository;
+
+    @Mock
+    private PostMapper postMapper;
+    @Mock
+    private UserMapper userMapper;
 
     @InjectMocks
     private PostService postService;
@@ -28,46 +37,52 @@ public class PostServiceTest {
     }
 
     @Test
-    void createPost_Success() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("testUser");
+    void createPost_ShouldReturnPostDTO() {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(1L);
+        userDTO.setUsername("testUser");
 
         Post post = new Post();
-        post.setContent("Test post");
-        post.setUser(user);
+        post.setId(1L);
+        post.setContent("test post");
+
+        PostDTO postDTO = new PostDTO();
+        postDTO.setId(1L);
+        postDTO.setContent("test post");
+        postDTO.setUser(userDTO);
 
         when(postRepository.save(any(Post.class))).thenReturn(post);
+        when(postMapper.toDTO(post)).thenReturn(postDTO);
 
-        Post result = postService.createPost(user, "Test post");
+        PostDTO result = postService.createPost(userMapper.toEntity(userDTO), "Test post");
 
         assertNotNull(result);
         assertEquals("Test post", result.getContent());
-        assertEquals(user, result.getUser());
+        assertEquals(userDTO.getUsername(), result.getUser().getUsername());
 
-        verify(postRepository, times(1)).save(any(Post.class));
+        verify(postRepository).save(any(Post.class));
+        verify(postMapper).toDTO(post);
     }
 
     @Test
-    void deletePost_Success() {
+    void deletePost_ShouldDeletePostWhenExists() {
         Long postId = 1L;
 
         when(postRepository.existsById(postId)).thenReturn(true);
 
         postService.deletePost(postId);
 
-        verify(postRepository, times(1)).deleteById(postId);
+        verify(postRepository).deleteById(postId);
     }
 
     @Test
-    void deletePost_PostNotFound() {
+    void deletePost_ShouldThrowExceptionWhenNotFound() {
         Long postId = 1L;
 
         when(postRepository.existsById(postId)).thenReturn(false);
 
         assertThrows(PostNotFound.class, () -> postService.deletePost(postId));
 
-        verify(postRepository, times(0)).deleteById(postId);
+        verify(postRepository, never()).deleteById(anyLong());
     }
-
 }

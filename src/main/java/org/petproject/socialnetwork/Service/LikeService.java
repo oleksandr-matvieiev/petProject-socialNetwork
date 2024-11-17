@@ -1,5 +1,7 @@
 package org.petproject.socialnetwork.Service;
 
+import org.petproject.socialnetwork.DTO.LikeDTO;
+import org.petproject.socialnetwork.Mapper.LikeMapper;
 import org.petproject.socialnetwork.Model.Likes;
 import org.petproject.socialnetwork.Model.Post;
 import org.petproject.socialnetwork.Model.User;
@@ -12,28 +14,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class LikeService {
     private final LikeRepository likeRepository;
+    private final LikeMapper likeMapper;
     private final Logger logger = LoggerFactory.getLogger(LikeService.class);
 
-    public LikeService(LikeRepository likeRepository) {
+    public LikeService(LikeRepository likeRepository, LikeMapper likeMapper) {
         this.likeRepository = likeRepository;
+        this.likeMapper = likeMapper;
     }
 
     @Transactional
-    public void toggleLike(Post post, User user) {
+    public LikeDTO toggleLike(Post post, User user) {
+        Likes like;
         if (likeRepository.existsByPostIdAndUserId(post.getId(), user.getId())) {
-            Likes like = likeRepository.findByPostIdAndUserId(post.getId(), user.getId());
-            logger.info("User: {} delete like from post id: {}", user.getUsername(), post.getId());
+            like = likeRepository.findByPostIdAndUserId(post.getId(), user.getId());
+            logger.info("User: {} removed like from post id: {}", user.getUsername(), post.getId());
             likeRepository.delete(like);
         } else {
-            Likes like = new Likes();
+            like = new Likes();
             like.setPost(post);
             like.setUser(user);
             logger.info("User: {} liked post id: {}", user.getUsername(), post.getId());
-            likeRepository.save(like);
+            return likeMapper.toDTO(likeRepository.save(like));
         }
-    }
-
-    public boolean isPostLikedByUser(Long postId, Long userId) {
-        return likeRepository.existsByPostIdAndUserId(postId, userId);
+        return null;
     }
 }

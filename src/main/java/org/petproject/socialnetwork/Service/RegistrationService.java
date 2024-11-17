@@ -1,7 +1,9 @@
 package org.petproject.socialnetwork.Service;
 
+import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Exceptions.UserAlreadyExists;
 import org.petproject.socialnetwork.Exceptions.UserWithEmailAlreadyExists;
+import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,14 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+    private final UserMapper userMapper;
 
-    public RegistrationService(UserRepository userRepository, PasswordEncoder encoder) {
+    public RegistrationService(UserRepository userRepository, PasswordEncoder encoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.encoder = encoder;
+        this.userMapper = userMapper;
     }
 
     @Transactional
-    public User registerUser(String username, String email, String password) {
+    public UserDTO registerUser(String username, String email, String password) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be blank.");
         }
@@ -40,6 +44,6 @@ public class RegistrationService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(encoder.encode(password));
-        return userRepository.save(user);
+        return userMapper.toDTO(userRepository.save(user));
     }
 }
