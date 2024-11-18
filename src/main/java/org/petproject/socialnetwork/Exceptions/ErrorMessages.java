@@ -1,5 +1,8 @@
 package org.petproject.socialnetwork.Exceptions;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorMessages {
     USER_NOT_FOUND("User not found."),
     EMAIL_NOT_FOUND("Email not found."),
@@ -8,7 +11,8 @@ public enum ErrorMessages {
     POST_NOT_FOUND("Post not found."),
     FOLLOW_SELF("You cannot follow yourself."),
     FOLLOW_ALREADY_EXISTS("Already following."),
-    POST_DOES_NOT_EXIST("Post does not exist.");
+    POST_DOES_NOT_EXIST("Post does not exist."),
+    ROLE_NOT_FOUND("Role not found.");
 
 
     private final String message;
@@ -17,7 +21,4 @@ public enum ErrorMessages {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
 }

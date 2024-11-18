@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UserNotFound extends RuntimeException {
-    private static final String DEFAULT_MESSAGE = "User not found";
+    private static final String DEFAULT_MESSAGE = ErrorMessages.USER_NOT_FOUND.getMessage();
 
     public UserNotFound() {
         super(DEFAULT_MESSAGE);

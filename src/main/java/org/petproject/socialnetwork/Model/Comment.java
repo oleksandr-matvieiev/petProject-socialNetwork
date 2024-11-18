@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @NoArgsConstructor
-@ToString(exclude = {"post","user"})
+@ToString(exclude = {"post", "user"})
 @EqualsAndHashCode(of = "id")
 public class Comment {
     @Id
@@ -19,7 +19,7 @@ public class Comment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id",nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,7 +1,20 @@
 package org.petproject.socialnetwork.Exceptions;
 
-public class UserWithEmailAlreadyExists extends RuntimeException{
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class UserWithEmailAlreadyExists extends RuntimeException {
+    public static final String DEFAULT_MESSAGE=ErrorMessages.EMAIL_ALREADY_REGISTERED.getMessage();
     public UserWithEmailAlreadyExists(String message) {
-    super(message);
+        super(message);
+        logError(message);
+    }
+    public UserWithEmailAlreadyExists(){
+        super(DEFAULT_MESSAGE);
+        logError(DEFAULT_MESSAGE);
+    }
+    public void logError(String message){
+        Logger logger= LoggerFactory.getLogger(UserWithEmailAlreadyExists.class);
+        logger.error(message);
     }
 }

@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PostNotFound extends RuntimeException {
-    private static final String DEFAULT_MESSAGE = "Post not found.";
+    private static final String DEFAULT_MESSAGE = ErrorMessages.POST_NOT_FOUND.getMessage();
 
     public PostNotFound() {
         super(DEFAULT_MESSAGE);
-        logError("Post not found.");
+        logError(DEFAULT_MESSAGE);
     }
 
     public PostNotFound(String message) {

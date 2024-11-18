@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UserAlreadyExists extends RuntimeException {
-    private static final String DEFAULT_MESSAGE = "Username is already taken.";
+    private static final String DEFAULT_MESSAGE = ErrorMessages.USERNAME_ALREADY_EXISTS.getMessage();
 
     public UserAlreadyExists() {
         super(DEFAULT_MESSAGE);

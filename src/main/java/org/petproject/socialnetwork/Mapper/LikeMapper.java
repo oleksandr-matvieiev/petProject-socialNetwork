@@ -6,6 +6,7 @@ import org.petproject.socialnetwork.Model.Likes;
 
 @Mapper(componentModel = "spring")
 public interface LikeMapper {
-   LikeDTO toDTO(Likes like);
-   Likes toEntity(LikeDTO likeDTO);
+    LikeDTO toDTO(Likes like);
+
+    Likes toEntity(LikeDTO likeDTO);
 }

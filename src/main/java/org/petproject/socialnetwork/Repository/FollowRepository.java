@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FollowRepository extends JpaRepository<Follow,Long> {
+public interface FollowRepository extends JpaRepository<Follow, Long> {
     List<Follow> findByFollower(User follower);
+
     List<Follow> findByFollowee(User followee);
 
     Optional<Follow> findByFollowerAndFollowee(User follower, User followee);

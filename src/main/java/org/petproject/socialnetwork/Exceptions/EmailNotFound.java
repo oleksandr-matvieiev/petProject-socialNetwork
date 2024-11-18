@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EmailNotFound extends RuntimeException {
-    private static final String DEFAULT_MESSAGE = "Email is already registered.";
+    private static final String DEFAULT_MESSAGE = ErrorMessages.EMAIL_NOT_FOUND.getMessage();
 
     public EmailNotFound() {
         super(DEFAULT_MESSAGE);
