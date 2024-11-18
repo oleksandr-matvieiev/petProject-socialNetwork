@@ -19,7 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.superadmim.username:superadmin")
+    @Value("${app.superadmim.username:superadmin}")
     private String superAdminUsername;
     @Value("${app.superadmin.email:superadmin@example.com}")
     private String superAdminEmail;
@@ -35,12 +35,22 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        for (RoleName roleName : RoleName.values()) {
-            roleRepository.findByName(roleName).orElseGet(() -> {
-                Role role = new Role();
-                role.setName(roleName);
-                return roleRepository.save(role);
-            });
+        if (roleRepository.findByName(RoleName.ROLE_USER).isEmpty()) {
+            Role userRole = new Role();
+            userRole.setName(RoleName.ROLE_USER);
+            roleRepository.save(userRole);
+        }
+
+        if (roleRepository.findByName(RoleName.ROLE_ADMIN).isEmpty()) {
+            Role adminRole = new Role();
+            adminRole.setName(RoleName.ROLE_ADMIN);
+            roleRepository.save(adminRole);
+        }
+
+        if (roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN).isEmpty()) {
+            Role superAdminRole = new Role();
+            superAdminRole.setName(RoleName.ROLE_SUPER_ADMIN);
+            roleRepository.save(superAdminRole);
         }
         if (!userRepository.existsByUsername(superAdminUsername)) {
             User superAdmin = new User();

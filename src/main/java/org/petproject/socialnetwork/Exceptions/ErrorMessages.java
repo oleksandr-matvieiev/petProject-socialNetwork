@@ -12,7 +12,8 @@ public enum ErrorMessages {
     FOLLOW_SELF("You cannot follow yourself."),
     FOLLOW_ALREADY_EXISTS("Already following."),
     POST_DOES_NOT_EXIST("Post does not exist."),
-    ROLE_NOT_FOUND("Role not found.");
+    ROLE_NOT_FOUND("Role not found."),
+    ILLEGAL_ARGUMENT("User use wrong args.");
 
 
     private final String message;

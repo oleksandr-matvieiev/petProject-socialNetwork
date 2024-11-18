@@ -1,6 +1,7 @@
 package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.UserDTO;
+import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Exceptions.UserNotFound;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.User;
@@ -25,20 +26,20 @@ public class UserService {
 
     public UserDTO findUserByUsernameOrThrow(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFound("User not found."));
+                .orElseThrow(UserNotFound::new);
         return userMapper.toDTO(user);
     }
 
     public UserDTO findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFound("User not found."));
+                .orElseThrow(UserNotFound::new);
         return userMapper.toDTO(user);
     }
 
     public void changePassword(User user, String newPassword) {
         if (user == null || newPassword == null || newPassword.isBlank()) {
             logger.error("Try to change password with null input");
-            throw new IllegalArgumentException("User or new password cannot be null/empty.");
+            throw new IllegalArgument("User or new password cannot be null/empty.");
         }
         user.setPassword(encoder.encode(newPassword));
         logger.info("User: {} change password", user.getUsername());

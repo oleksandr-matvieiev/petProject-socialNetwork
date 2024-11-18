@@ -2,6 +2,7 @@ package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.FollowDTO;
 import org.petproject.socialnetwork.Exceptions.ErrorMessages;
+import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Mapper.FollowMapper;
 import org.petproject.socialnetwork.Model.Follow;
 import org.petproject.socialnetwork.Model.User;
@@ -27,15 +28,15 @@ public class FollowService {
     public FollowDTO followUser(User follower, User followee) {
         if (follower == null || followee == null) {
             logger.error("Follower or followee is null.");
-            throw new IllegalArgumentException("Follower and followee cannot be null.");
+            throw new IllegalArgument("Follower and followee cannot be null.");
         }
         if (follower.equals(followee)) {
             logger.warn("User {} tried to follow themselves.", follower.getUsername());
-            throw new IllegalArgumentException(ErrorMessages.FOLLOW_SELF.getMessage());
+            throw new IllegalArgument(ErrorMessages.FOLLOW_SELF.getMessage());
         }
         if (followRepository.findByFollowerAndFollowee(follower, followee).isPresent()) {
             logger.info("User {} is already following user {}.", follower.getUsername(), followee.getUsername());
-            throw new IllegalArgumentException(ErrorMessages.FOLLOW_ALREADY_EXISTS.getMessage());
+            throw new IllegalArgument(ErrorMessages.FOLLOW_ALREADY_EXISTS.getMessage());
         }
 
         Follow follow = new Follow();

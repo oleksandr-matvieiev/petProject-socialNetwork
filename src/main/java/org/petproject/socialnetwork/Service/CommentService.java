@@ -1,6 +1,7 @@
 package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.CommentDTO;
+import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.CommentMapper;
 import org.petproject.socialnetwork.Model.Comment;
 import org.petproject.socialnetwork.Model.Post;
@@ -30,7 +31,7 @@ public class CommentService {
     public CommentDTO addComment(Post post, String content, User user) {
         if (post == null || post.getId() == null || !postRepository.existsById(post.getId())) {
             logger.error("Post does not exist.");
-            throw new IllegalArgumentException("Post does not exist.");
+            throw new PostNotFound("Post does not exist.");
         }
 
         Comment comment = new Comment();

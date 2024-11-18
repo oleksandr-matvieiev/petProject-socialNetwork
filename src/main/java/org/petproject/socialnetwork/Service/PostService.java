@@ -2,6 +2,7 @@ package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.PostDTO;
 import org.petproject.socialnetwork.Exceptions.ErrorMessages;
+import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.PostMapper;
 import org.petproject.socialnetwork.Model.Post;
@@ -29,11 +30,11 @@ public class PostService {
     public PostDTO createPost(User user, String content) {
         if (user == null) {
             logger.error("Attempt to create post with null user.");
-            throw new IllegalArgumentException("User cannot be null.");
+            throw new IllegalArgument("User cannot be null.");
         }
         if (content == null || content.isBlank()) {
             logger.error("Attempt to create post with blank content.");
-            throw new IllegalArgumentException("Content cannot be blank.");
+            throw new IllegalArgument("Content cannot be blank.");
         }
 
         Post post = new Post();
@@ -46,7 +47,7 @@ public class PostService {
     public void deletePost(Long postId) {
         if (!postRepository.existsById(postId)) {
             logger.error("Attempt to delete non-existent post with ID: {}", postId);
-            throw new PostNotFound(ErrorMessages.POST_NOT_FOUND.getMessage());
+            throw new PostNotFound();
         }
         postRepository.deleteById(postId);
         logger.info("Post with ID: {} successfully deleted.", postId);
