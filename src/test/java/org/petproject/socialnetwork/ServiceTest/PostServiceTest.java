@@ -11,6 +11,7 @@ import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.PostMapper;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.Post;
+import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.PostRepository;
 import org.petproject.socialnetwork.Service.PostService;
 
@@ -38,27 +39,34 @@ class PostServiceTest {
 
     @Test
     void createPost_ShouldReturnPostDTO() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(1L);
-        userDTO.setUsername("testUser");
+        User user=new User();
+        user.setId(1L);
+        user.setUsername("testUser");
+        user.setEmail("test@example.com");
+        user.setPassword("password");
 
         Post post = new Post();
         post.setId(1L);
-        post.setContent("test post");
+        post.setContent("Test post");
+
+        UserDTO userDTO=new UserDTO();
+        userDTO.setId(1L);
+        userDTO.setUsername("testUser");
 
         PostDTO postDTO = new PostDTO();
         postDTO.setId(1L);
-        postDTO.setContent("test post");
+        postDTO.setContent("Test post");
         postDTO.setUser(userDTO);
 
         when(postRepository.save(any(Post.class))).thenReturn(post);
-        when(postMapper.toDTO(post)).thenReturn(postDTO);
+        when(postMapper.toDTO(any(Post.class))).thenReturn(postDTO);
 
-        PostDTO result = postService.createPost(userMapper.toEntity(userDTO), "Test post");
+
+        PostDTO result = postService.createPost(user, postDTO);
 
         assertNotNull(result);
         assertEquals("Test post", result.getContent());
-        assertEquals(userDTO.getUsername(), result.getUser().getUsername());
+        assertEquals(user.getUsername(), result.getUser().getUsername());
 
         verify(postRepository).save(any(Post.class));
         verify(postMapper).toDTO(post);

@@ -2,10 +2,7 @@ package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.LoginRequest;
 import org.petproject.socialnetwork.DTO.UserDTO;
-import org.petproject.socialnetwork.Exceptions.IllegalArgument;
-import org.petproject.socialnetwork.Exceptions.RoleNotFound;
-import org.petproject.socialnetwork.Exceptions.UserAlreadyExists;
-import org.petproject.socialnetwork.Exceptions.UserWithEmailAlreadyExists;
+import org.petproject.socialnetwork.Exceptions.*;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.Role;
 import org.petproject.socialnetwork.Model.RoleName;
@@ -17,9 +14,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class AuthenticationService {
@@ -76,6 +75,30 @@ public class AuthenticationService {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return tokenProvider.generateToken(loginRequest.getUsername());
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalArgument("No authenticated user found.");
+        }
+        Object principal = authentication.getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof String) {
+            username = (String) principal;
+        } else {
+            throw new IllegalArgument("Unexpected authentication principal.");
+        }
+        return userRepository.findByUsername(username)
+                .orElseThrow(UserNotFound::new);
+    }
+
+    public UserDTO findUserByUsername(String username) {
+        User user=userRepository.findByUsername(username)
+                .orElseThrow(UserNotFound::new);
+        return userMapper.toDTO(user);
     }
 
 }

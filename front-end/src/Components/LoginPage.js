@@ -6,7 +6,7 @@ const AuthPage = () => {
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [error, setError] = useState(null);
-    const [isRegistering, setIsRegistering] = useState(false); // Контролює форму входу/реєстрації
+    const [isRegistering, setIsRegistering] = useState(false);
 
     const apiBaseUrl = 'http://localhost:8080/api/auth';
 
@@ -14,10 +14,10 @@ const AuthPage = () => {
         e.preventDefault();
         try {
             const response = await axios.post(`${apiBaseUrl}/login`, { username, password });
-            const Token  = response.data;
+            const Token  = response.data.token;
 
             if (Token) {
-                localStorage.setItem('authToken', Token);
+                localStorage.setItem('Token', Token);
                 console.log('Login successful. Token:', Token);
                 setError(null);
             } else {
@@ -44,11 +44,11 @@ const AuthPage = () => {
     };
 
     const isAuthenticated = () => {
-        return !!localStorage.getItem('authToken');
+        return !!localStorage.getItem('Token');
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('Token');
         localStorage.removeItem('roles');
         alert('Logged out successfully.');
     };

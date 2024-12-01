@@ -1,7 +1,6 @@
 package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.PostDTO;
-import org.petproject.socialnetwork.Exceptions.ErrorMessages;
 import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.PostMapper;
@@ -27,19 +26,21 @@ public class PostService {
         this.postMapper = postMapper;
     }
 
-    public PostDTO createPost(User user, String content) {
+    public PostDTO createPost(User user, PostDTO postDTO) {
         if (user == null) {
             logger.error("Attempt to create post with null user.");
             throw new IllegalArgument("User cannot be null.");
         }
-        if (content == null || content.isBlank()) {
+        if (postDTO.getContent() == null || postDTO.getContent().isBlank()) {
             logger.error("Attempt to create post with blank content.");
             throw new IllegalArgument("Content cannot be blank.");
         }
-
         Post post = new Post();
+//        if (!postDTO.getImageUrl().isEmpty()){
+//            post.setImageUrl(postDTO.getImageUrl());
+//        }
         post.setUser(user);
-        post.setContent(content);
+        post.setContent(postDTO.getContent());
         return postMapper.toDTO(postRepository.save(post));
     }
 
