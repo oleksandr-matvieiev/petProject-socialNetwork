@@ -32,6 +32,12 @@ public class PostController {
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 
+    @GetMapping("/allPosts")
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        List<PostDTO> allPosts = postService.getAllPosts();
+        return ResponseEntity.ok(allPosts);
+    }
+
     @GetMapping("/userPosts/{username}")
     public ResponseEntity<List<PostDTO>> getPostsByUser(@PathVariable String username) {
         UserDTO userDTO = authenticationService.findUserByUsername(username);

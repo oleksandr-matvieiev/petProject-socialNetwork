@@ -26,6 +26,7 @@ public class PostService {
         this.postMapper = postMapper;
     }
 
+
     public PostDTO createPost(User user, PostDTO postDTO) {
         if (user == null) {
             logger.error("Attempt to create post with null user.");
@@ -36,9 +37,9 @@ public class PostService {
             throw new IllegalArgument("Content cannot be blank.");
         }
         Post post = new Post();
-//        if (!postDTO.getImageUrl().isEmpty()){
-//            post.setImageUrl(postDTO.getImageUrl());
-//        }
+        if (!postDTO.getImageUrl().isEmpty()) {
+            post.setImageUrl(postDTO.getImageUrl());
+        }
         post.setUser(user);
         post.setContent(postDTO.getContent());
         return postMapper.toDTO(postRepository.save(post));
@@ -52,6 +53,12 @@ public class PostService {
         }
         postRepository.deleteById(postId);
         logger.info("Post with ID: {} successfully deleted.", postId);
+    }
+
+    public List<PostDTO> getAllPosts() {
+        return postRepository.findAll().stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public List<PostDTO> getPostsByUser(User user) {
