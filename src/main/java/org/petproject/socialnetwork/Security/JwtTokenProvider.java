@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -20,12 +21,16 @@ public class JwtTokenProvider {
     private long jwtExpirationInMs;
 
     public String generateToken(String username, List<String> roles) {
+        List<String> formattedRoles = roles.stream()
+                .map(role -> "ROLE_" + role)
+                .toList();
+
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("roles", roles) // Додаємо ролі
+                .claim("roles", formattedRoles) // Додаємо ролі
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

@@ -9,6 +9,7 @@ import org.petproject.socialnetwork.Service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,10 +27,12 @@ public class PostController {
     }
 
     @PostMapping("/createPost")
-    public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO) {
+    public ResponseEntity<PostDTO> createPost(
+            @RequestParam("content") String content,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
         User currentUser = authenticationService.getCurrentUser();
-        System.out.println(currentUser.getUsername()+12321);
-        PostDTO createdPost = postService.createPost(currentUser, postDTO);
+        PostDTO createdPost = postService.createPost(currentUser, content, image);
 
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
