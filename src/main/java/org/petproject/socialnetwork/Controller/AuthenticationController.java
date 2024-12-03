@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
@@ -29,9 +31,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest){
         String token= authenticationService.login(loginRequest);
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(Map.of("token",token));
     }
 //    @GetMapping("/me")
 //    public ResponseEntity<String> getCurrentUser() {

@@ -35,21 +35,21 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (roleRepository.findByName(RoleName.ROLE_USER).isEmpty()) {
+        if (roleRepository.findByName(RoleName.USER).isEmpty()) {
             Role userRole = new Role();
-            userRole.setName(RoleName.ROLE_USER);
+            userRole.setName(RoleName.USER);
             roleRepository.save(userRole);
         }
 
-        if (roleRepository.findByName(RoleName.ROLE_ADMIN).isEmpty()) {
+        if (roleRepository.findByName(RoleName.ADMIN).isEmpty()) {
             Role adminRole = new Role();
-            adminRole.setName(RoleName.ROLE_ADMIN);
+            adminRole.setName(RoleName.ADMIN);
             roleRepository.save(adminRole);
         }
 
-        if (roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN).isEmpty()) {
+        if (roleRepository.findByName(RoleName.SUPER_ADMIN).isEmpty()) {
             Role superAdminRole = new Role();
-            superAdminRole.setName(RoleName.ROLE_SUPER_ADMIN);
+            superAdminRole.setName(RoleName.SUPER_ADMIN);
             roleRepository.save(superAdminRole);
         }
         if (!userRepository.existsByUsername(superAdminUsername)) {
@@ -58,7 +58,7 @@ public class DataInitializer implements CommandLineRunner {
             superAdmin.setEmail(superAdminEmail);
             superAdmin.setPassword(passwordEncoder.encode(superAdminPassword));
 
-            Role superAdminRole = roleRepository.findByName(RoleName.ROLE_SUPER_ADMIN)
+            Role superAdminRole = roleRepository.findByName(RoleName.SUPER_ADMIN)
                     .orElseThrow(() -> new RoleNotFound("Super Admin role not found"));
 
             superAdmin.setRoles(Set.of(superAdminRole));

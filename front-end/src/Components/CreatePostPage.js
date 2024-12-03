@@ -11,6 +11,10 @@ const CreatePostPage = () => {
         e.preventDefault();
         try {
             const token=localStorage.getItem("Token");
+            if (!token) {
+                console.error('No token found in localStorage');
+                return;
+            }
             const response = await axios.post(`${apiBaseUrl}/createPost`, {content,imageUrl}, {
                 headers: {
                     Authorization: `Bearer ${token}`,

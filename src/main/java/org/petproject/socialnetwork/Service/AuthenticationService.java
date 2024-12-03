@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationService {
@@ -60,7 +62,7 @@ public class AuthenticationService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(encoder.encode(password));
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+        Role userRole = roleRepository.findByName(RoleName.USER)
                 .orElseThrow(RoleNotFound::new);
         user.getRoles().add(userRole);
         return userMapper.toDTO(userRepository.save(user));
@@ -74,7 +76,15 @@ public class AuthenticationService {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return tokenProvider.generateToken(loginRequest.getUsername());
+
+        // Додано: Витяг ролей користувача для токена
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(UserNotFound::new);
+        List<String> roles = user.getRoles().stream()
+                .map(role -> role.getName().name())
+                .collect(Collectors.toList());
+
+        return tokenProvider.generateToken(user.getUsername(), roles);
     }
 
     public User getCurrentUser() {
@@ -96,9 +106,8 @@ public class AuthenticationService {
     }
 
     public UserDTO findUserByUsername(String username) {
-        User user=userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFound::new);
         return userMapper.toDTO(user);
     }
-
 }
