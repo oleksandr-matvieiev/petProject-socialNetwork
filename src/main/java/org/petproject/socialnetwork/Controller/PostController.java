@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -30,7 +31,7 @@ public class PostController {
     public ResponseEntity<PostDTO> createPost(
             @RequestParam("content") String content,
             @RequestParam(value = "image", required = false) MultipartFile image
-    ) {
+    ) throws IOException {
         User currentUser = authenticationService.getCurrentUser();
         PostDTO createdPost = postService.createPost(currentUser, content, image);
 

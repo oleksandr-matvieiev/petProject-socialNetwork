@@ -34,7 +34,7 @@ const HomePage = () => {
                                 <p>{post.content}</p>
                                 {post.imageUrl && (
                                     <img
-                                        src={post.imageUrl}
+                                        src={`http://localhost:8080${post.imageUrl}`}
                                         alt="Post"
                                         style={{maxWidth: '200px', marginTop: '10px'}}
                                     />

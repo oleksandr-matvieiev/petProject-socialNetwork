@@ -15,6 +15,8 @@ const CreatePostPage = () => {
                 console.error('No token found in localStorage');
                 return;
             }
+            console.log(token);
+
             const formData = new FormData();
             formData.append("content", content);
             if (file) {
@@ -27,6 +29,9 @@ const CreatePostPage = () => {
                     'Content-Type': 'multipart/form-data'
                 },
             });
+
+
+            console.log(response.data)
             setPosts([response.data, ...posts]);
             setContent("");
             setFile(null);
