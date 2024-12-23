@@ -11,4 +11,5 @@ public class PostDTO {
     private String imageUrl;
     private LocalDateTime createdAt;
     private UserDTO user;
+    private int likeCount;
 }

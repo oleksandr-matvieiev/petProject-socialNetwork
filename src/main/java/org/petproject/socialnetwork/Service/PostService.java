@@ -6,6 +6,7 @@
     import org.petproject.socialnetwork.Mapper.PostMapper;
     import org.petproject.socialnetwork.Model.Post;
     import org.petproject.socialnetwork.Model.User;
+    import org.petproject.socialnetwork.Repository.LikeRepository;
     import org.petproject.socialnetwork.Repository.PostRepository;
     import org.slf4j.Logger;
     import org.slf4j.LoggerFactory;
@@ -25,13 +26,15 @@
     public class PostService {
         private final PostRepository postRepository;
         private final PostMapper postMapper;
+        private final LikeRepository likeRepository;
         private final Logger logger = LoggerFactory.getLogger(PostService.class);
     
         private static final String UPLOAD_DIR = "src/main/resources/uploads/";
     
-        public PostService(PostRepository postRepository, PostMapper postMapper) {
+        public PostService(PostRepository postRepository, PostMapper postMapper, LikeRepository likeRepository) {
             this.postRepository = postRepository;
             this.postMapper = postMapper;
+            this.likeRepository = likeRepository;
         }
     
     
@@ -81,10 +84,14 @@
             postRepository.deleteById(postId);
             logger.info("Post with ID: {} successfully deleted.", postId);
         }
-    
+
         public List<PostDTO> getAllPosts() {
             return postRepository.findAll().stream()
-                    .map(postMapper::toDTO)
+                    .map(post -> {
+                        PostDTO postDTO = postMapper.toDTO(post);
+                        postDTO.setLikeCount(likeRepository.findByPostId(post.getId()).size());
+                        return postDTO;
+                    })
                     .collect(Collectors.toList());
         }
     

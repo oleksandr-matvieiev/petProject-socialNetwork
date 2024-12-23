@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -14,11 +13,9 @@ import java.util.List;
 public class JwtTokenProvider {
     private final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    private final String jwtSecret = Base64.getEncoder().encodeToString(getNumber().getBytes());
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;
 
-    private static String getNumber() {
-        return "738452983475238947523894752389475238947523894752389475238947523894752389475243265635435123233414213";
-    }
 
     @Value("${app.jwt.expiration}")
     private long jwtExpirationInMs;

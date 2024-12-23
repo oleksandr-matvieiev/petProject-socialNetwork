@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/posts/allPosts").permitAll()
                         .requestMatchers("/api/posts/userPosts/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/posts/{postId}/like").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);

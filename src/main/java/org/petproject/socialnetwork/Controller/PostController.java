@@ -1,10 +1,12 @@
 package org.petproject.socialnetwork.Controller;
 
+import org.petproject.socialnetwork.DTO.LikeDTO;
 import org.petproject.socialnetwork.DTO.PostDTO;
 import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Service.AuthenticationService;
+import org.petproject.socialnetwork.Service.LikeService;
 import org.petproject.socialnetwork.Service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,13 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostController {
     private final PostService postService;
+    private final LikeService likeService;
     private final AuthenticationService authenticationService;
     private final UserMapper userMapper;
 
-    public PostController(PostService postService, AuthenticationService authenticationService, UserMapper userMapper) {
+    public PostController(PostService postService, LikeService likeService, AuthenticationService authenticationService, UserMapper userMapper) {
         this.postService = postService;
+        this.likeService = likeService;
         this.authenticationService = authenticationService;
         this.userMapper = userMapper;
     }
@@ -55,6 +59,13 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable Long postId) {
+        User currentUser = authenticationService.getCurrentUser();
+        LikeDTO likeDTO = likeService.toggleLike(postId, currentUser.getId());
+        return ResponseEntity.ok(likeDTO != null ? likeDTO : "Like removed");
     }
 
 
