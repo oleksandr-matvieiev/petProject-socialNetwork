@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorMessages {
     USER_NOT_FOUND("User not found."),
+    MESSAGE_NOT_FOUND("Message not found"),
     EMAIL_NOT_FOUND("Email not found."),
     USERNAME_ALREADY_EXISTS("Username is already taken."),
     EMAIL_ALREADY_REGISTERED("Email is already registered."),

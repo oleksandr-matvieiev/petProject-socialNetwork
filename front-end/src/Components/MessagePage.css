@@ -1,0 +1,86 @@
+.messages-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+.inbox, .conversation, .message-form {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px;
+    padding: 15px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.inbox ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.inbox li {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.message-read {
+    background: #f1f1f1;
+    color: #888;
+}
+
+.message-unread {
+    background: #ffffff;
+    font-weight: bold;
+    color: #000;
+}
+
+.chat {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.sent {
+    background: #d1ffd1;
+    text-align: right;
+}
+
+.received {
+    background: #d1d1ff;
+    text-align: left;
+}
+
+textarea, input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
+}
+
+button {
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
