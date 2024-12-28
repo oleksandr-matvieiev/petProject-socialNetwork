@@ -6,6 +6,8 @@ const HomePage = () => {
     const [error, setError] = useState(null);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
+    const [comments, setComments] = useState({});
+    const [newComment, setNewComment] = useState("");
     const apiBaseUrl = 'http://localhost:8080/api/posts';
 
     const fetchPosts = async () => {
@@ -21,6 +23,34 @@ const HomePage = () => {
             setLoading(false);
         }
     };
+    const fetchComments = async (postId) => {
+        try {
+            const response = await axios.get(`${apiBaseUrl}/${postId}/comments`);
+            setComments((prevComments) => ({
+                ...prevComments, [postId]: response.data,
+            }));
+        } catch (err) {
+            console.error(`Error fetching comments for post ${postId}:`, err);
+        }
+    };
+    const addComment = async (postId) => {
+        const token = localStorage.getItem("Token");
+        try {
+            const response = await axios.post(
+                `http://localhost:8080/api/posts/${postId}/addComment`,
+                { content: newComment },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setComments((prevComments) => ({
+                ...prevComments,
+                [postId]: [...(prevComments[postId] || []), response.data],
+            }));
+            setNewComment("")
+        } catch (err) {
+            console.error(`Error adding comment to post ${postId}:`, err);
+        }
+    };
+
 
     const toggleLike = async (postId) => {
         const token = localStorage.getItem('Token');
@@ -28,7 +58,7 @@ const HomePage = () => {
             const response = await axios.post(
                 `http://localhost:8080/api/posts/${postId}/like`,
                 {},
-                { headers: { Authorization: `Bearer ${token}` } }
+                {headers: {Authorization: `Bearer ${token}`}}
             );
 
             const updatedPosts = posts.map((post) => {
@@ -48,7 +78,6 @@ const HomePage = () => {
             console.error('Error liking post:', err);
         }
     };
-
 
 
     const searchPosts = async (username) => {
@@ -113,6 +142,37 @@ const HomePage = () => {
                                     {post.likedByCurrentUser ? "Unlike" : "Like"}
                                 </button>
                                 <p>{post.likeCount} {post.likeCount === 1 ? 'like' : 'likes'}</p>
+                                {/* Коментарі */}
+                                <button
+                                    onClick={() => fetchComments(post.id)}
+                                    style={{marginTop: "10px", padding: "5px 10px"}}
+                                >
+                                    View Comments
+                                </button>
+                                {comments[post.id] && (
+                                    <ul style={{marginTop: "10px"}}>
+                                        {comments[post.id].map((comment) => (
+                                            <li key={comment.id}>
+                                                <p>{comment.user.username}: {comment.content}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+
+                                {/* Додавання коментарів */}
+                                <input
+                                    type="text"
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    placeholder="Add a comment"
+                                    style={{marginTop: "10px", padding: "5px", width: "80%"}}
+                                />
+                                <button
+                                    onClick={() => addComment(post.id)}
+                                    style={{padding: "5px 10px", marginTop: "10px"}}
+                                >
+                                    Add Comment
+                                </button>
                             </li>
                         ))}
                     </ul>

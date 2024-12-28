@@ -51,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/posts/userPosts/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll()
                         .requestMatchers("/api/posts/{postId}/like").hasRole("USER")
+                        .requestMatchers("/api/posts/{postId}/comments").permitAll()
+                        .requestMatchers("/api/posts/{postId}/addComment").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
