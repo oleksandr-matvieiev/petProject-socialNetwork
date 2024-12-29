@@ -31,4 +31,9 @@ public class Message {
 
     @Column(nullable = false)
     private boolean isRead;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_id", nullable = false)
+    private Chat chat;
+
 }

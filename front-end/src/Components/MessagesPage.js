@@ -1,42 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './MessagePage.css'; // Додатковий CSS файл для стилізації
+import './MessagePage.css';
 
 const MessagesPage = () => {
-    const [inbox, setInbox] = useState([]);
-    const [conversation, setConversation] = useState([]);
-    const [receiver, setReceiver] = useState(""); // Для ручного введення отримувача
+    const [chats, setChats] = useState([]); // Список чатів
+    const [conversation, setConversation] = useState([]); // Повідомлення в поточній розмові
+    const [receiver, setReceiver] = useState(""); // Ім'я отримувача для нового чату
     const [currentChatUser, setCurrentChatUser] = useState(""); // Поточний співрозмовник
     const [currentUser, setCurrentUser] = useState(""); // Поточний користувач
-    const [content, setContent] = useState("");
+    const [content, setContent] = useState(""); // Зміст повідомлення
 
-    const apiBaseUrl = 'http://localhost:8080/api/messages';
+    const apiBaseUrl = 'http://localhost:8080/api';
 
     useEffect(() => {
-        fetchInbox();
+        fetchChats();
         fetchCurrentUser();
     }, []);
 
-    const fetchInbox = async () => {
+    const fetchChats = async () => {
         const token = localStorage.getItem("Token");
         try {
-            const response = await axios.get(`${apiBaseUrl}/inbox`, {
+            const response = await axios.get(`${apiBaseUrl}/chats`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setInbox(response.data);
+            setChats(response.data);
         } catch (error) {
-            console.error("Error fetching inbox:", error);
+            console.error("Error fetching chats:", error);
         }
     };
 
     const fetchCurrentUser = async () => {
         const token = localStorage.getItem("Token");
         try {
-            const response = await axios.get('http://localhost:8080/api/auth/me', {
+            const response = await axios.get(`${apiBaseUrl}/auth/me`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            const username = response.data.replace('username', '').trim(); // Видаляємо "username" з API
-            setCurrentUser(username);
+            setCurrentUser(response.data.replace('username', '').trim());
         } catch (error) {
             console.error("Error fetching current user:", error);
         }
@@ -45,22 +44,42 @@ const MessagesPage = () => {
     const fetchConversation = async (receiverUsername) => {
         const token = localStorage.getItem("Token");
         try {
-            const response = await axios.get(`${apiBaseUrl}/conversation/${receiverUsername}`, {
+            const response = await axios.get(`${apiBaseUrl}/messages/conversation/${receiverUsername}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setConversation(response.data);
             setCurrentChatUser(receiverUsername);
             setReceiver(receiverUsername);
 
+            // Відзначити непрочитані повідомлення
             response.data.forEach(async (msg) => {
                 if (!msg.isRead && msg.receiverUsername === currentUser) {
-                    await axios.post(`${apiBaseUrl}/${msg.id}/read`, {}, {
+                    await axios.post(`${apiBaseUrl}/messages/${msg.id}/read`, {}, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
                 }
             });
         } catch (error) {
             console.error("Error fetching conversation:", error);
+        }
+    };
+
+    const createNewChat = async () => {
+        const token = localStorage.getItem("Token");
+        if (!receiver) {
+            alert("Please enter a username to start a chat.");
+            return;
+        }
+        try {
+            const response = await axios.post(`${apiBaseUrl}/chats/create`, null, {
+                params: { receiverUsername: receiver },
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setChats([...chats, response.data]); // Додаємо новий чат у список
+            setConversation([]);
+            setCurrentChatUser(receiver);
+        } catch (error) {
+            console.error("Error creating a chat:", error);
         }
     };
 
@@ -71,7 +90,7 @@ const MessagesPage = () => {
             return;
         }
         try {
-            await axios.post(`${apiBaseUrl}/send`, { receiver, content }, {
+            await axios.post(`${apiBaseUrl}/messages/send`, { receiver, content }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setContent("");
@@ -85,27 +104,37 @@ const MessagesPage = () => {
         <div className="messages-page">
             <h1>Messages</h1>
 
-            <div className="inbox">
-                <h2>Inbox</h2>
-                {inbox.length ? (
+            {/* Список чатів */}
+            <div className="chat-list">
+                <h2>Your Chats</h2>
+                {chats.length ? (
                     <ul>
-                        {inbox.map((message) => (
-                            <li
-                                key={message.id}
-                                className={message.isRead ? "message-read" : "message-unread"}
-                                onClick={() => fetchConversation(message.senderUsername)}
-                            >
-                                <strong>{message.senderUsername}</strong>: {message.content}
-                            </li>
-                        ))}
+                        {chats.map((chat) => {
+                            const otherUser = chat.userOne === currentUser ? chat.userTwo : chat.userOne;
+                            return (
+                                <li key={chat.id} onClick={() => fetchConversation(otherUser)}>
+                                    {otherUser}
+                                </li>
+                            );
+                        })}
                     </ul>
                 ) : (
-                    <p>No messages in your inbox.</p>
+                    <p>No chats available.</p>
                 )}
+                <div>
+                    <input
+                        type="text"
+                        placeholder="Enter username for new chat"
+                        value={receiver}
+                        onChange={(e) => setReceiver(e.target.value)}
+                    />
+                    <button onClick={createNewChat}>Start New Chat</button>
+                </div>
             </div>
 
+            {/* Поточна розмова */}
             <div className="conversation">
-                <h2>Conversation with {currentChatUser || "..."}</h2>
+                <h2>Conversation with {currentChatUser || "New Chat"}</h2>
                 <div className="chat">
                     {conversation.map((msg) => (
                         <div
@@ -120,14 +149,8 @@ const MessagesPage = () => {
                 </div>
             </div>
 
+            {/* Форма для відправки повідомлення */}
             <div className="message-form">
-                <h2>Send a Message</h2>
-                <input
-                    type="text"
-                    placeholder="Receiver's username"
-                    value={receiver}
-                    onChange={(e) => setReceiver(e.target.value)}
-                />
                 <textarea
                     placeholder="Type your message..."
                     value={content}

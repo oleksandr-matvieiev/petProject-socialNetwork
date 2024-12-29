@@ -4,8 +4,10 @@ import org.petproject.socialnetwork.DTO.MessageDTO;
 import org.petproject.socialnetwork.Exceptions.MessageNotFound;
 import org.petproject.socialnetwork.Exceptions.UserNotFound;
 import org.petproject.socialnetwork.Mapper.MessageMapper;
+import org.petproject.socialnetwork.Model.Chat;
 import org.petproject.socialnetwork.Model.Message;
 import org.petproject.socialnetwork.Model.User;
+import org.petproject.socialnetwork.Repository.ChatRepository;
 import org.petproject.socialnetwork.Repository.MessageRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -21,16 +23,29 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final MessageMapper messageMapper;
+    private final ChatRepository chatRepository;
 
-    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageMapper messageMapper) {
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository, MessageMapper messageMapper, ChatRepository chatRepository) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.messageMapper = messageMapper;
+        this.chatRepository = chatRepository;
     }
 
     public MessageDTO sendMessage(String senderUsername, String receiverUsername, String content) {
         User sender = userRepository.findByUsername(senderUsername).orElseThrow(UserNotFound::new);
         User receiver = userRepository.findByUsername(receiverUsername).orElseThrow(UserNotFound::new);
+
+        Chat chat = chatRepository.findByUserOneAndUserTwo(sender, receiver)
+                .or(() -> chatRepository.findByUserOneAndUserTwo(receiver, sender))
+                .orElse(null);
+
+        if (chat == null) {
+            chat = new Chat();
+            chat.setUserOne(sender);
+            chat.setUserTwo(receiver);
+            chat = chatRepository.save(chat);
+        }
 
         Message message = new Message();
         message.setSender(sender);
@@ -38,9 +53,11 @@ public class MessageService {
         message.setContent(content);
         message.setCreatedAt(LocalDateTime.now());
         message.setRead(false);
+        message.setChat(chat);
 
         return messageMapper.toDTO(messageRepository.save(message));
     }
+
 
     public List<MessageDTO> getConversation(String senderUsername, String receiverUsername) {
         User sender = userRepository.findByUsername(senderUsername).orElseThrow(UserNotFound::new);
