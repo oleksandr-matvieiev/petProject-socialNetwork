@@ -77,7 +77,6 @@ public class AuthenticationService {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Додано: Витяг ролей користувача для токена
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(UserNotFound::new);
         List<String> roles = user.getRoles().stream()

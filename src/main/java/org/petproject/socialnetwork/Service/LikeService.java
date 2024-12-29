@@ -23,7 +23,6 @@ public class LikeService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(LikeService.class);
 
     public LikeService(LikeRepository likeRepository, LikeMapper likeMapper, PostRepository postRepository, UserRepository userRepository) {
         this.likeRepository = likeRepository;
