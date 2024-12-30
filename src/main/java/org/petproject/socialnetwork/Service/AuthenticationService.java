@@ -70,7 +70,7 @@ public class AuthenticationService {
         user.setBio(bio);
         if (image != null && !image.isEmpty()) {
             String imageUrl = fileStorageService.saveImage(image, FileCategory.PROFILE_IMAGE);
-            user.setProfile_picture(imageUrl);
+            user.setProfilePicture(imageUrl);
         }
         Role userRole = roleRepository.findByName(RoleName.USER)
                 .orElseThrow(RoleNotFound::new);

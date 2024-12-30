@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @Getter
 @NoArgsConstructor
-@ToString(exclude = {"profile_picture", "bio", "followers", "following"})
+@ToString(exclude = {"profilePicture", "bio", "followers", "following"})
 @EqualsAndHashCode(of = "id")
 public class User {
     @Id
@@ -36,7 +36,7 @@ public class User {
     private String password;
 
     @Column
-    private String profile_picture;
+    private String profilePicture;
 
 
     @Column

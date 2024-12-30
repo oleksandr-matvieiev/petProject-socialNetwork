@@ -44,9 +44,9 @@ const UserProfile = () => {
         <div>
             <h1>Profile of {user.username}</h1>
 
-            {user.profile_picture && (
+            {user.profilePicture && (
                 <img
-                    src={`http://localhost:8080${user.profile_picture}`}
+                    src={`http://localhost:8080${user.profilePicture}`}
                     alt="Profile"
                     style={{width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover'}}
                 />

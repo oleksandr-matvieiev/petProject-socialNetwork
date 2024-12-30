@@ -52,6 +52,7 @@ public class PostService {
         post.setUser(user);
         post.setContent(content);
 
+
         if (image != null && !image.isEmpty()) {
             String imageUrl = fileStorageService.saveImage(image, FileCategory.POST_IMAGE);
             post.setImageUrl(imageUrl);
