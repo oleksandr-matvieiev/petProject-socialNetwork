@@ -14,7 +14,7 @@ import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    @Value("${app.file.upload-dir-posts}")
+    @Value("${app.file.upload-base-dir}")
     private String uploadDir;
 
     @Override

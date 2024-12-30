@@ -2,17 +2,15 @@ package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.LoginRequest;
 import org.petproject.socialnetwork.DTO.UserDTO;
+import org.petproject.socialnetwork.Enums.FileCategory;
+import org.petproject.socialnetwork.Enums.RoleName;
 import org.petproject.socialnetwork.Exceptions.*;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.Role;
-import org.petproject.socialnetwork.Model.RoleName;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.RoleRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.petproject.socialnetwork.Security.JwtTokenProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,12 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,17 +32,16 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
-    private final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+    private final FileStorageService fileStorageService;
     private final UserMapper userMapper;
-    @Value("${app.file.upload-dir-profile}")
-    private String uploadDir;
 
-    public AuthenticationService(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, UserMapper userMapper) {
+    public AuthenticationService(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, FileStorageService fileStorageService, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
+        this.fileStorageService = fileStorageService;
         this.userMapper = userMapper;
     }
 
@@ -77,7 +69,7 @@ public class AuthenticationService {
         user.setPassword(encoder.encode(password));
         user.setBio(bio);
         if (image != null && !image.isEmpty()) {
-            String imageUrl=saveImage(image);
+            String imageUrl = fileStorageService.saveImage(image, FileCategory.PROFILE_IMAGE);
             user.setProfile_picture(imageUrl);
         }
         Role userRole = roleRepository.findByName(RoleName.USER)
@@ -128,21 +120,5 @@ public class AuthenticationService {
         return userMapper.toDTO(user);
     }
 
-    private String saveImage(MultipartFile file) throws IOException {
-        if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
-            logger.error("Invalid file type: {}. Only images allowed.", file.getContentType());
-            throw new IllegalArgumentException("Only image files are allowed");
-        }
 
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path uploadPath = Paths.get(uploadDir);
-
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-        Path filePath = uploadPath.resolve(fileName);
-        Files.write(filePath, file.getBytes());
-        logger.info("Image {} uploaded successfully to {}", fileName, filePath.toAbsolutePath());
-        return fileName;
-    }
 }

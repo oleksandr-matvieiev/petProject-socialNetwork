@@ -1,6 +1,7 @@
 package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.PostDTO;
+import org.petproject.socialnetwork.Enums.FileCategory;
 import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.PostMapper;
@@ -10,17 +11,12 @@ import org.petproject.socialnetwork.Repository.LikeRepository;
 import org.petproject.socialnetwork.Repository.PostRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,14 +24,14 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final LikeRepository likeRepository;
+    private final FileStorageService fileStorageService;
     private final Logger logger = LoggerFactory.getLogger(PostService.class);
-    @Value("${app.file.upload-dir-posts}")
-    private String uploadDir;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, LikeRepository likeRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, LikeRepository likeRepository, FileStorageService fileStorageService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.likeRepository = likeRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     public Post getPostById(Long id) {
@@ -57,30 +53,10 @@ public class PostService {
         post.setContent(content);
 
         if (image != null && !image.isEmpty()) {
-            String imageUrl = saveImage(image);
-            post.setImageUrl("/uploads/" + imageUrl);
+            String imageUrl = fileStorageService.saveImage(image, FileCategory.POST_IMAGE);
+            post.setImageUrl(imageUrl);
         }
         return postMapper.toDTO(postRepository.save(post));
-    }
-
-    private String saveImage(MultipartFile file) throws IOException {
-        if (!file.getContentType().startsWith("image/")) {
-            logger.error("Invalid file type: {}. Only images allowed.", file.getContentType());
-            throw new IllegalArgumentException("Only image files are allowed");
-        }
-
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path uploadPath = Paths.get(uploadDir);
-
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        Path filePath = uploadPath.resolve(fileName);
-        Files.write(filePath, file.getBytes());
-        logger.info("Image {} uploaded successfully to {}", fileName, filePath.toAbsolutePath());
-
-        return fileName;
     }
 
     @Transactional
