@@ -10,6 +10,7 @@ import org.petproject.socialnetwork.Repository.LikeRepository;
 import org.petproject.socialnetwork.Repository.PostRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,8 +29,8 @@ public class PostService {
     private final PostMapper postMapper;
     private final LikeRepository likeRepository;
     private final Logger logger = LoggerFactory.getLogger(PostService.class);
-
-    private static final String UPLOAD_DIR = "src/main/resources/uploads/";
+    @Value("${app.file.upload-dir-posts}")
+    private String uploadDir;
 
     public PostService(PostRepository postRepository, PostMapper postMapper, LikeRepository likeRepository) {
         this.postRepository = postRepository;
@@ -67,15 +68,18 @@ public class PostService {
             logger.error("Invalid file type: {}. Only images allowed.", file.getContentType());
             throw new IllegalArgumentException("Only image files are allowed");
         }
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        String uploadDir = "src/main/resources/static/uploads/";
-        Path path = Paths.get(uploadDir + fileName);
 
-        if (!Files.exists(path.getParent())) {
-            Files.createDirectories(path.getParent());
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path uploadPath = Paths.get(uploadDir);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
         }
-        Files.write(path, file.getBytes());
-        logger.info("Image {} uploaded successfully", fileName);
+
+        Path filePath = uploadPath.resolve(fileName);
+        Files.write(filePath, file.getBytes());
+        logger.info("Image {} uploaded successfully to {}", fileName, filePath.toAbsolutePath());
+
         return fileName;
     }
 
