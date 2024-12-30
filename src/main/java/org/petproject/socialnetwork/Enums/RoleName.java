@@ -1,4 +1,4 @@
-package org.petproject.socialnetwork.Model;
+package org.petproject.socialnetwork.Enums;
 
 public enum RoleName {
     USER,

@@ -1,7 +1,7 @@
 package org.petproject.socialnetwork.Repository;
 
 import org.petproject.socialnetwork.Model.Role;
-import org.petproject.socialnetwork.Model.RoleName;
+import org.petproject.socialnetwork.Enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

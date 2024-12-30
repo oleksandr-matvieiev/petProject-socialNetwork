@@ -53,7 +53,7 @@ const CreatePostPage = () => {
                 />
                 <input
                     type="file"
-                    onChange={(e) => setFile(e.target.files[0])} // Обробка вибору файлу
+                    onChange={(e) => setFile(e.target.files[0])}
                 />
                 <button type="submit">Create Post</button>
             </form>
@@ -62,7 +62,11 @@ const CreatePostPage = () => {
                 {posts.map((post) => (
                     <div key={post.id}>
                         <p>{post.content}</p>
-                        {post.imageUrl && <img src={post.imageUrl} alt="Post" style={{maxWidth: "300px"}}/>}
+                        {post.imageUrl &&
+                            <img
+                                src={`http://localhost:8080${post.imageUrl}`}
+                                alt="Post"
+                                style={{maxWidth: "300px"}}/>}
                     </div>
                 ))}
             </div>

@@ -2,7 +2,7 @@ package org.petproject.socialnetwork;
 
 import org.petproject.socialnetwork.Exceptions.RoleNotFound;
 import org.petproject.socialnetwork.Model.Role;
-import org.petproject.socialnetwork.Model.RoleName;
+import org.petproject.socialnetwork.Enums.RoleName;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.RoleRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;

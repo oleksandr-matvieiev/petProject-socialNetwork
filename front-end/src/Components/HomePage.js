@@ -142,7 +142,6 @@ const HomePage = () => {
                                     {post.likedByCurrentUser ? "Unlike" : "Like"}
                                 </button>
                                 <p>{post.likeCount} {post.likeCount === 1 ? 'like' : 'likes'}</p>
-                                {/* Коментарі */}
                                 <button
                                     onClick={() => fetchComments(post.id)}
                                     style={{marginTop: "10px", padding: "5px 10px"}}
@@ -159,7 +158,6 @@ const HomePage = () => {
                                     </ul>
                                 )}
 
-                                {/* Додавання коментарів */}
                                 <input
                                     type="text"
                                     value={newComment}

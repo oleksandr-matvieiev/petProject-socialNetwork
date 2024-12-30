@@ -2,6 +2,7 @@ package org.petproject.socialnetwork.Model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.petproject.socialnetwork.Enums.RoleName;
 
 @Entity
 @Getter
