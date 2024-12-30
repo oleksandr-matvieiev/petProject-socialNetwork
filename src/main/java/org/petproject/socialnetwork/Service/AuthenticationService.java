@@ -10,6 +10,9 @@ import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.RoleRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.petproject.socialnetwork.Security.JwtTokenProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,8 +21,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +39,10 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
+    private final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
     private final UserMapper userMapper;
+    @Value("${app.file.upload-dir-profile}")
+    private String uploadDir;
 
     public AuthenticationService(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
@@ -41,7 +54,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public UserDTO registerUser(String username, String email, String password) {
+    public UserDTO registerUser(String username, String email, String bio, String password, MultipartFile image) throws IOException {
         if (username == null || username.isBlank()) {
             throw new IllegalArgument("Username cannot be blank.");
         }
@@ -62,6 +75,11 @@ public class AuthenticationService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(encoder.encode(password));
+        user.setBio(bio);
+        if (image != null && !image.isEmpty()) {
+            String imageUrl=saveImage(image);
+            user.setProfile_picture(imageUrl);
+        }
         Role userRole = roleRepository.findByName(RoleName.USER)
                 .orElseThrow(RoleNotFound::new);
         user.getRoles().add(userRole);
@@ -108,5 +126,23 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFound::new);
         return userMapper.toDTO(user);
+    }
+
+    private String saveImage(MultipartFile file) throws IOException {
+        if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
+            logger.error("Invalid file type: {}. Only images allowed.", file.getContentType());
+            throw new IllegalArgumentException("Only image files are allowed");
+        }
+
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path uploadPath = Paths.get(uploadDir);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+        Path filePath = uploadPath.resolve(fileName);
+        Files.write(filePath, file.getBytes());
+        logger.info("Image {} uploaded successfully to {}", fileName, filePath.toAbsolutePath());
+        return fileName;
     }
 }

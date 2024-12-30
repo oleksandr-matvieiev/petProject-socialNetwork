@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 
 const AuthPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const [bio, setBio] = useState('');
+    const [profilePhoto, setProfilePhoto] = useState(null);
     const [error, setError] = useState(null);
     const [isRegistering, setIsRegistering] = useState(false);
 
@@ -13,8 +15,8 @@ const AuthPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${apiBaseUrl}/login`, { username, password });
-            const Token  = response.data.token;
+            const response = await axios.post(`${apiBaseUrl}/login`, {username, password});
+            const Token = response.data.token;
 
             if (Token) {
                 localStorage.setItem('Token', Token);
@@ -32,9 +34,22 @@ const AuthPage = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${apiBaseUrl}/register`, { username, email, password });
+            const formData = new FormData();
+            formData.append("username", username);
+            formData.append("email", email);
+            formData.append("password", password);
+            formData.append("bio", bio);
+            if (profilePhoto) {
+                formData.append("image", profilePhoto)
+            }
+            const response = await axios.post(`${apiBaseUrl}/register`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+            });
             console.log('Registration successful:', response.data);
             alert('Registration successful! Please login.');
+            setProfilePhoto(null);
             setIsRegistering(false);
             setError(null);
         } catch (err) {
@@ -57,29 +72,44 @@ const AuthPage = () => {
         <div>
             <h1>{isRegistering ? 'Register' : 'Login'}</h1>
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{color: 'red'}}>{error}</p>}
 
             <form onSubmit={isRegistering ? handleRegister : handleLogin}>
                 <input
                     type="text"
-                    placeholder="Username"
+                    placeholder="Enter your username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                 />
                 {isRegistering && (
                     <input
                         type="email"
-                        placeholder="Email"
+                        placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 )}
                 <input
                     type="password"
-                    placeholder="Password"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
+                {isRegistering && (
+                    <input
+                        type="text"
+                        placeholder={"Enter your bio"}
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                    />)}
+                {isRegistering && (
+
+                    <input
+                        type="file"
+                        placeholder="Upload your profile foto"
+                        onChange={(e) => setProfilePhoto(e.target.files[0])}
+                    />)}
+
                 <button type="submit">{isRegistering ? 'Register' : 'Login'}</button>
             </form>
 
@@ -88,7 +118,7 @@ const AuthPage = () => {
             </button>
 
             {isAuthenticated() && (
-                <button onClick={handleLogout} style={{ marginTop: '10px' }}>
+                <button onClick={handleLogout} style={{marginTop: '10px'}}>
                     Logout
                 </button>
             )}

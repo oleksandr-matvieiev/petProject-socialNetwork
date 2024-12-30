@@ -7,7 +7,9 @@ import org.petproject.socialnetwork.Service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -21,10 +23,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody UserDTO userDTO) {
-        UserDTO registeredUser = authenticationService.registerUser(userDTO.getUsername(),
-                userDTO.getEmail(),
-                userDTO.getPassword());
+    public ResponseEntity<UserDTO> registerUser(
+            @Valid @RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam(value = "bio", required = false) String bio,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) throws IOException {
+        UserDTO registeredUser = authenticationService.registerUser(username, email, bio, password, image);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
 
 
