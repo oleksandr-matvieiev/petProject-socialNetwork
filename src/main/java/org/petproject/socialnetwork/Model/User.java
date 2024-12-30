@@ -38,6 +38,7 @@ public class User {
     @Column
     private String profile_picture;
 
+
     @Column
     private String bio;
 
