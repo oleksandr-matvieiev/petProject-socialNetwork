@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './MessagePage.css';
+import NavigationMenu from "./NavigationMenu";
+
 
 const MessagesPage = () => {
-    const [chats, setChats] = useState([]); // Список чатів
-    const [conversation, setConversation] = useState([]); // Повідомлення в поточній розмові
-    const [receiver, setReceiver] = useState(""); // Ім'я отримувача для нового чату
-    const [currentChatUser, setCurrentChatUser] = useState(""); // Поточний співрозмовник
-    const [currentUser, setCurrentUser] = useState(""); // Поточний користувач
-    const [content, setContent] = useState(""); // Зміст повідомлення
+    const [chats, setChats] = useState([]);
+    const [conversation, setConversation] = useState([]);
+    const [receiver, setReceiver] = useState("");
+    const [currentChatUser, setCurrentChatUser] = useState("");
+    const [currentUser, setCurrentUser] = useState("");
+    const [content, setContent] = useState("");
 
     const apiBaseUrl = 'http://localhost:8080/api';
 
@@ -104,8 +106,8 @@ const MessagesPage = () => {
         <div className="messages-page">
             <h1>Messages</h1>
 
-            {/* Список чатів */}
             <div className="chat-list">
+                <NavigationMenu />
                 <h2>Your Chats</h2>
                 {chats.length ? (
                     <ul>
@@ -132,7 +134,6 @@ const MessagesPage = () => {
                 </div>
             </div>
 
-            {/* Поточна розмова */}
             <div className="conversation">
                 <h2>Conversation with {currentChatUser || "New Chat"}</h2>
                 <div className="chat">
@@ -149,7 +150,6 @@ const MessagesPage = () => {
                 </div>
             </div>
 
-            {/* Форма для відправки повідомлення */}
             <div className="message-form">
                 <textarea
                     placeholder="Type your message..."

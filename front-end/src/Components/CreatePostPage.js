@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import axios from "axios";
+import NavigationMenu from "./NavigationMenu";
 
 const CreatePostPage = () => {
     const [posts, setPosts] = useState([]);
@@ -44,6 +45,7 @@ const CreatePostPage = () => {
 
     return (
         <div>
+            <NavigationMenu />
             <h2>Create Post</h2>
             <form onSubmit={handleCreatePost}>
                 <textarea

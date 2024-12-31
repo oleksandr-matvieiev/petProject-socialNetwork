@@ -1,5 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
+import {Link} from "react-router-dom";
+import './HomePage.css';
+import NavigationMenu from "./NavigationMenu";
+
 
 const HomePage = () => {
     const [posts, setPosts] = useState([]);
@@ -38,8 +42,8 @@ const HomePage = () => {
         try {
             const response = await axios.post(
                 `http://localhost:8080/api/posts/${postId}/addComment`,
-                { content: newComment },
-                { headers: { Authorization: `Bearer ${token}` } }
+                {content: newComment},
+                {headers: {Authorization: `Bearer ${token}`}}
             );
             setComments((prevComments) => ({
                 ...prevComments,
@@ -103,7 +107,8 @@ const HomePage = () => {
     }, []);
 
     return (
-        <div>
+        <div className="page-container">
+            <NavigationMenu/>
             <h1>Welcome to the Home Page</h1>
             <div style={{marginBottom: '20px'}}>
                 <input
@@ -124,8 +129,25 @@ const HomePage = () => {
                     <h2>{search ? `Posts by "${search}"` : "All Posts"}:</h2>
                     <ul>
                         {posts.map((post) => (
-                            <li key={post.id} style={{marginBottom: '20px'}}>
-                                <h3>{post.user.username}</h3>
+                            <li key={post.id} className="post-item">
+                                <div style={{display: "flex", alignItems: "center", marginBottom: "10px"}}>
+                                    <img
+                                        src={`http://localhost:8080${post.user.profilePicture}`}
+                                        alt={`${post.user.username}'s avatar`}
+                                        style={{
+                                            width: "40px",
+                                            height: "40px",
+                                            borderRadius: "50%",
+                                            marginRight: "10px",
+                                        }}
+                                    />
+                                    <h3>
+                                        <Link to={`/profile/${post.user.username}`}
+                                              style={{textDecoration: 'none', color: '#007bff'}}>
+                                            {post.user.username}
+                                        </Link>
+                                    </h3>
+                                </div>
                                 <p>{post.content}</p>
                                 {post.imageUrl && (
                                     <img

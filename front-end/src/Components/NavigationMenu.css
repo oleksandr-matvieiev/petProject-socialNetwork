@@ -1,0 +1,27 @@
+.navigation-menu {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.navigation-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+}
+
+.navigation-menu li {
+    display: inline;
+}
+
+.navigation-menu a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.navigation-menu a:hover {
+    text-decoration: underline;
+}
