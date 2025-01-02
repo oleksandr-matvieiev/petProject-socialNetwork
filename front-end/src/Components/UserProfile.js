@@ -1,6 +1,7 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import axios from "axios";
+import NavigationMenu from "./NavigationMenu";
 
 const UserProfile = () => {
     const {username} = useParams();
@@ -42,6 +43,7 @@ const UserProfile = () => {
 
     return (
         <div>
+            <NavigationMenu/>
             <h1>Profile of {user.username}</h1>
 
             {user.profilePicture && (
