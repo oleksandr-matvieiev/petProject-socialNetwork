@@ -1,32 +1,54 @@
 import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './NavigationMenu.css';
 
 const NavigationMenu = () => {
     const [username, setUsername] = useState(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
         setUsername(storedUsername);
     });
 
-    return (
-        <nav className="navigation-menu">
-            <ul>
-                <li>
-                    <Link to="/">Home</Link>
-                </li>
-                <li>
-                    <Link to="/messages">Messages</Link>
-                </li>
-                {username && (
-                    <li>
-                        <Link to={`/profile/${username}`}>Profile</Link>
-                    </li>
-                )}
+    const handleLogout = () => {
+        localStorage.removeItem('roles');
+        localStorage.removeItem('Token');
+        localStorage.removeItem('username');
+        navigate("/");
+    }
 
-            </ul>
-        </nav>
+    return (
+        <div className="navigation-container">
+            <nav className="navigation-menu">
+                <ul>
+                    <li>
+                        <Link to="/">Home</Link>
+                    </li>
+                    {username&& (
+                        <li>
+                            <Link to="/messages">Messages</Link>
+                        </li>
+                    )}
+                    {username && (
+                        <li>
+                        <Link to={`/profile/${username}`}>Profile</Link>
+                        </li>
+                    )}
+                    {!username&&(
+                        <li>
+                            <Link to={`/login`}>Registration / Login</Link>
+                        </li>
+                    )}
+                </ul>
+            </nav>
+            {username && (
+                <button className="logout-button" onClick={handleLogout}>
+                    Logout
+                </button>
+            )}
+        </div>
     );
 };
 

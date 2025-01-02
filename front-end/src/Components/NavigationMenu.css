@@ -1,7 +1,14 @@
-.navigation-menu {
+.navigation-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #f8f9fa;
     padding: 10px;
     border-bottom: 1px solid #ddd;
+}
+
+.navigation-menu {
+    margin: 0;
 }
 
 .navigation-menu ul {
@@ -24,4 +31,19 @@
 
 .navigation-menu a:hover {
     text-decoration: underline;
+}
+
+.logout-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-left: auto;
+}
+
+.logout-button:hover {
+    background-color: #e63939;
 }
