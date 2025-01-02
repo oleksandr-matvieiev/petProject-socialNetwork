@@ -41,6 +41,9 @@ const NavigationMenu = () => {
                             <Link to={`/login`}>Registration / Login</Link>
                         </li>
                     )}
+                    {username&&(
+                        <Link to={`/post/create`}>Create Post</Link>
+                    )}
                 </ul>
             </nav>
             {username && (
