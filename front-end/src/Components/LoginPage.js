@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AuthPage = () => {
     const [username, setUsername] = useState('');
@@ -10,6 +11,7 @@ const AuthPage = () => {
     const [error, setError] = useState(null);
     const [isRegistering, setIsRegistering] = useState(false);
 
+    const navigate=useNavigate();
     const apiBaseUrl = 'http://localhost:8080/api/auth';
 
     const handleLogin = async (e) => {
@@ -20,8 +22,9 @@ const AuthPage = () => {
 
             if (Token) {
                 localStorage.setItem('Token', Token);
-                console.log('Login successful. Token:', Token);
                 setError(null);
+                alert("Login successful!")
+                navigate("/");
             } else {
                 setError('Invalid response from server. No token provided.');
             }
