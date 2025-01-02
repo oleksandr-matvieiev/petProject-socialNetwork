@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import NavigationMenu from "./NavigationMenu";
 
 const AuthPage = () => {
     const [username, setUsername] = useState('');
@@ -75,6 +76,7 @@ const AuthPage = () => {
 
     return (
         <div>
+            <NavigationMenu/>
             <h1>{isRegistering ? 'Register' : 'Login'}</h1>
 
             {error && <p style={{color: 'red'}}>{error}</p>}
