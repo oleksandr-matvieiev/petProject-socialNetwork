@@ -1,8 +1,15 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
 import './NavigationMenu.css';
 
 const NavigationMenu = () => {
+    const [username, setUsername] = useState(null);
+
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('username');
+        setUsername(storedUsername);
+    });
+
     return (
         <nav className="navigation-menu">
             <ul>
@@ -12,9 +19,12 @@ const NavigationMenu = () => {
                 <li>
                     <Link to="/messages">Messages</Link>
                 </li>
-                <li>
-                    <Link to="/profile">Profile</Link>
-                </li>
+                {username && (
+                    <li>
+                        <Link to={`/profile/${username}`}>Profile</Link>
+                    </li>
+                )}
+
             </ul>
         </nav>
     );

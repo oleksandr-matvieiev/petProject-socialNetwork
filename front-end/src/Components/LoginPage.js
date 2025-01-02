@@ -22,6 +22,7 @@ const AuthPage = () => {
 
             if (Token) {
                 localStorage.setItem('Token', Token);
+                localStorage.setItem('username',username);
                 setError(null);
                 alert("Login successful!")
                 navigate("/");
