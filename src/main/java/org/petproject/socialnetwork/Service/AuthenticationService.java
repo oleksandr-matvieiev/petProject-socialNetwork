@@ -11,6 +11,7 @@ import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.RoleRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.petproject.socialnetwork.Security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,6 +35,8 @@ public class AuthenticationService {
     private final PasswordEncoder encoder;
     private final FileStorageService fileStorageService;
     private final UserMapper userMapper;
+    @Value("${app.file.default-avatar-photo}")
+    private String DEFAULT_AVATAR_PHOTO;
 
     public AuthenticationService(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, FileStorageService fileStorageService, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
@@ -71,6 +74,8 @@ public class AuthenticationService {
         if (image != null && !image.isEmpty()) {
             String imageUrl = fileStorageService.saveImage(image, FileCategory.PROFILE_IMAGE);
             user.setProfilePicture(imageUrl);
+        } else {
+            user.setProfilePicture(DEFAULT_AVATAR_PHOTO);
         }
         Role userRole = roleRepository.findByName(RoleName.USER)
                 .orElseThrow(RoleNotFound::new);
