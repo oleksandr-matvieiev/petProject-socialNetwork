@@ -69,6 +69,7 @@ const AuthPage = () => {
     const handleLogout = () => {
         localStorage.removeItem('Token');
         localStorage.removeItem('roles');
+        localStorage.removeItem('username')
         alert('Logged out successfully.');
     };
 
