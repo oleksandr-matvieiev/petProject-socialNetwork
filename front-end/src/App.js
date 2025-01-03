@@ -7,6 +7,7 @@ import CreatePostPage from "./Components/CreatePostPage";
 import UserProfile from "./Components/UserProfile";
 import MessagesPage from "./Components/MessagesPage";
 import VerifyEmailPage from "./Components/VerifyEmailPage";
+import EditProfilePage from "./Components/EditProfilePage";
 
 function App() {
     return (
@@ -24,6 +25,8 @@ function App() {
                     <Route path={"/messages"} element={<MessagesPage/>}/>
 
                     <Route path={"/verify-email"} element={<VerifyEmailPage/>}/>
+
+                    <Route path={"/profile/edit"} element={<EditProfilePage/>}/>
                 </Routes>
             </div>
         </Router>
