@@ -94,6 +94,19 @@ public class AuthenticationService {
         return userMapper.toDTO(userRepository.save(user));
     }
 
+    public boolean verifyEmail(String email, String code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFound::new);
+        if (user.getVerificationCode().equals(code)) {
+            user.setEmailVerified(true);
+            user.setVerificationCode(null);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+
     public String login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -105,6 +118,11 @@ public class AuthenticationService {
 
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(UserNotFound::new);
+
+        if (!user.isEmailVerified()) {
+            throw new IllegalArgumentException("Email not verified");
+        }
+
         List<String> roles = user.getRoles().stream()
                 .map(role -> role.getName().name())
                 .collect(Collectors.toList());
@@ -135,6 +153,5 @@ public class AuthenticationService {
                 .orElseThrow(UserNotFound::new);
         return userMapper.toDTO(user);
     }
-
 
 }
