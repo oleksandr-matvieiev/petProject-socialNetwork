@@ -11,4 +11,5 @@ public class UserDTO  {
     private String profilePicture;
     private String bio;
     private String password;
+    private boolean emailVerified;
 }

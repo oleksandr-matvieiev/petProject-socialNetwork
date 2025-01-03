@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,17 +35,19 @@ public class AuthenticationService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final FileStorageService fileStorageService;
+    private final EmailService emailService;
     private final UserMapper userMapper;
     @Value("${app.file.default-avatar-photo}")
     private String DEFAULT_AVATAR_PHOTO;
 
-    public AuthenticationService(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, FileStorageService fileStorageService, UserMapper userMapper) {
+    public AuthenticationService(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, FileStorageService fileStorageService, EmailService emailService, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.fileStorageService = fileStorageService;
+        this.emailService = emailService;
         this.userMapper = userMapper;
     }
 
@@ -71,15 +74,23 @@ public class AuthenticationService {
         user.setEmail(email);
         user.setPassword(encoder.encode(password));
         user.setBio(bio);
+
         if (image != null && !image.isEmpty()) {
             String imageUrl = fileStorageService.saveImage(image, FileCategory.PROFILE_IMAGE);
             user.setProfilePicture(imageUrl);
         } else {
             user.setProfilePicture(DEFAULT_AVATAR_PHOTO);
         }
+
         Role userRole = roleRepository.findByName(RoleName.USER)
                 .orElseThrow(RoleNotFound::new);
         user.getRoles().add(userRole);
+
+        String verificationCode = String.format("%06d", new Random().nextInt(999999));
+        user.setVerificationCode(verificationCode);
+
+        emailService.sendVerificationEmail(email, verificationCode);
+
         return userMapper.toDTO(userRepository.save(user));
     }
 
