@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import NavigationMenu from "./NavigationMenu";
 
 const AuthPage = () => {
@@ -12,7 +12,7 @@ const AuthPage = () => {
     const [error, setError] = useState(null);
     const [isRegistering, setIsRegistering] = useState(false);
 
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const apiBaseUrl = 'http://localhost:8080/api/auth';
 
     const handleLogin = async (e) => {
@@ -23,7 +23,7 @@ const AuthPage = () => {
 
             if (Token) {
                 localStorage.setItem('Token', Token);
-                localStorage.setItem('username',username);
+                localStorage.setItem('username', username);
                 setError(null);
                 alert("Login successful!")
                 navigate("/");
@@ -57,6 +57,10 @@ const AuthPage = () => {
             setProfilePhoto(null);
             setIsRegistering(false);
             setError(null);
+
+            localStorage.setItem('emailToVerify', email);
+            navigate('/verify-email');
+
         } catch (err) {
             console.error('Registration failed:', err);
             setError('Registration failed. Please try again.');

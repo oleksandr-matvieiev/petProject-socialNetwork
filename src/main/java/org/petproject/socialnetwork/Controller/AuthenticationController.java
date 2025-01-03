@@ -37,7 +37,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String code) {
+    public ResponseEntity<String> verifyEmail(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");
+        String code = requestBody.get("code");
+
+        if (email == null || code == null) {
+            return ResponseEntity.badRequest().body("Email and code are required.");
+        }
         boolean isVerified = authenticationService.verifyEmail(email, code);
         if (isVerified) {
             return ResponseEntity.ok("Email verified successfully.");

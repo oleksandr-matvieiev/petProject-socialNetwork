@@ -6,6 +6,7 @@ import LoginPage from "./Components/LoginPage";
 import CreatePostPage from "./Components/CreatePostPage";
 import UserProfile from "./Components/UserProfile";
 import MessagesPage from "./Components/MessagesPage";
+import VerifyEmailPage from "./Components/VerifyEmailPage";
 
 function App() {
     return (
@@ -19,7 +20,10 @@ function App() {
                     <Route path={"/post/create"} element={<CreatePostPage/>}/>
 
                     <Route path={"/profile/:username"} element={<UserProfile/>}/>
+
                     <Route path={"/messages"} element={<MessagesPage/>}/>
+
+                    <Route path={"/verify-email"} element={<VerifyEmailPage/>}/>
                 </Routes>
             </div>
         </Router>
