@@ -253,7 +253,7 @@ bio=New bio (optional)
 newPicture=newProfileImage.jpg (optional)
 ```
 ## API Security
-- **JWT Authentication**: Secure all endpoints (except for login, registration, and password reset) with JWT tokens.
+- **JWT Authentication**: Secure all endpoints (except for login, registration) with JWT tokens.
 - **Role-Based Access Control**:Ensure role-specific access
 - **User**: Can browse posts, likes and comments them, make chats with another users and send them messages, edit profile...(in develop).
 - **Admin**: In develop.
