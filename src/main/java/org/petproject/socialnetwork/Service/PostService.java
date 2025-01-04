@@ -7,6 +7,7 @@ import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.PostMapper;
 import org.petproject.socialnetwork.Model.Post;
 import org.petproject.socialnetwork.Model.User;
+import org.petproject.socialnetwork.Repository.CommentRepository;
 import org.petproject.socialnetwork.Repository.LikeRepository;
 import org.petproject.socialnetwork.Repository.PostRepository;
 import org.slf4j.Logger;
@@ -24,13 +25,15 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
     private final FileStorageService fileStorageService;
     private final Logger logger = LoggerFactory.getLogger(PostService.class);
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, LikeRepository likeRepository, FileStorageService fileStorageService) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, LikeRepository likeRepository, CommentRepository commentRepository, FileStorageService fileStorageService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.likeRepository = likeRepository;
+        this.commentRepository = commentRepository;
         this.fileStorageService = fileStorageService;
     }
 
@@ -66,6 +69,8 @@ public class PostService {
             logger.error("Attempt to delete non-existent post with ID: {}", postId);
             throw new PostNotFound();
         }
+        likeRepository.deleteByPostId(postId);
+        commentRepository.deleteByPostId(postId);
         postRepository.deleteById(postId);
         logger.info("Post with ID: {} successfully deleted.", postId);
     }
