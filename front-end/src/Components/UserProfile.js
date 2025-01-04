@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams,useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import NavigationMenu from './NavigationMenu';
 
@@ -10,23 +10,35 @@ const UserProfile = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const apiBaseUrl = 'http://localhost:8080/api/user';
-
+    const apiBaseUrl = 'http://localhost:8080/api';
     const currentUsername = localStorage.getItem('username');
+
+    const deletePost = async (postId) => {
+        try {
+            const token = localStorage.getItem('Token');
+            await axios.delete(`${apiBaseUrl}/posts/deletePost/${postId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setPosts(posts.filter(post => post.id !== postId));
+        } catch (err) {
+            console.error('Error deleting post:', err);
+            alert('Failed to delete the post. Please try again.');
+        }
+    };
+
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 setLoading(true);
-
                 const [userResponse, postsResponse] = await Promise.all([
-                    axios.get(`${apiBaseUrl}/${username}`),
-                    axios.get(`${apiBaseUrl}/${username}/posts`),
+                    axios.get(`${apiBaseUrl}/user/${username}`),
+                    axios.get(`${apiBaseUrl}/posts/userPosts/${username}`),
                 ]);
-
                 setUser(userResponse.data);
                 setPosts(postsResponse.data);
-
                 setError(null);
             } catch (err) {
                 console.error('Error fetching user profile:', err);
@@ -35,7 +47,6 @@ const UserProfile = () => {
                 setLoading(false);
             }
         };
-
         fetchUserData();
     }, [username]);
 
@@ -94,6 +105,22 @@ const UserProfile = () => {
                                 />
                             )}
                             <small>Posted on: {new Date(post.createdAt).toLocaleString()}</small>
+                            {currentUsername === post.user.username && (
+                                <button
+                                    onClick={() => deletePost(post.id)}
+                                    style={{
+                                        marginLeft: '10px',
+                                        padding: '5px 10px',
+                                        background: '#dc3545',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Delete
+                                </button>
+                            )}
                         </li>
                     ))}
                 </ul>
