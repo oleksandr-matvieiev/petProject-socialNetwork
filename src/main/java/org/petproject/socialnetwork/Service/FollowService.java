@@ -1,7 +1,7 @@
 package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.FollowDTO;
-import org.petproject.socialnetwork.Exceptions.ErrorMessages;
+import org.petproject.socialnetwork.Enums.ErrorMessages;
 import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Mapper.FollowMapper;
 import org.petproject.socialnetwork.Model.Follow;
