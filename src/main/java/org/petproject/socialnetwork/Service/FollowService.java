@@ -2,6 +2,7 @@ package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.FollowDTO;
 import org.petproject.socialnetwork.Enums.ErrorMessages;
+import org.petproject.socialnetwork.Enums.NotificationType;
 import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Mapper.FollowMapper;
 import org.petproject.socialnetwork.Model.Follow;
@@ -16,11 +17,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class FollowService {
+    private final NotificationService notificationService;
     private final FollowRepository followRepository;
     private final FollowMapper followMapper;
     private final Logger logger = LoggerFactory.getLogger(FollowService.class);
 
-    public FollowService(FollowRepository followRepository, FollowMapper followMapper) {
+    public FollowService(NotificationService notificationService, FollowRepository followRepository, FollowMapper followMapper) {
+        this.notificationService = notificationService;
         this.followRepository = followRepository;
         this.followMapper = followMapper;
     }
@@ -42,9 +45,13 @@ public class FollowService {
         Follow follow = new Follow();
         follow.setFollower(follower);
         follow.setFollowee(followee);
+
         logger.info("User {} successfully followed user {}.", follower.getUsername(), followee.getUsername());
+
+        notificationService.createNotification(followee, follower, NotificationType.FOLLOW, "You have a new follower: " + follower.getUsername() + "!");
         return followMapper.toDTO(followRepository.save(follow));
     }
+
     public void unfollowUser(User follower, User followee) {
         Follow follow = followRepository.findByFollowerAndFollowee(follower, followee)
                 .orElseThrow(() -> new IllegalArgument("Follow relationship does not exist."));

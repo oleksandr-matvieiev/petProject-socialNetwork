@@ -1,6 +1,7 @@
 package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.CommentDTO;
+import org.petproject.socialnetwork.Enums.NotificationType;
 import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.CommentMapper;
 import org.petproject.socialnetwork.Model.Comment;
@@ -17,12 +18,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
+    private final NotificationService notificationService;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final CommentMapper commentMapper;
     private final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
-    public CommentService(CommentRepository commentRepository, PostRepository postRepository, CommentMapper commentMapper) {
+    public CommentService(NotificationService notificationService, CommentRepository commentRepository, PostRepository postRepository, CommentMapper commentMapper) {
+        this.notificationService = notificationService;
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.commentMapper = commentMapper;
@@ -38,6 +41,8 @@ public class CommentService {
         comment.setPost(post);
         comment.setContent(content);
         comment.setUser(user);
+
+        notificationService.createNotification(post.getUser(), user, NotificationType.COMMENT, "You have a new comment on your post!");
         return commentMapper.toDTO(commentRepository.save(comment));
     }
 
