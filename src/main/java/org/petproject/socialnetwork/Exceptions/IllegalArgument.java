@@ -1,5 +1,6 @@
 package org.petproject.socialnetwork.Exceptions;
 
+import org.petproject.socialnetwork.Enums.ErrorMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

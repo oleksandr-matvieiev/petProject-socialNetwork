@@ -1,4 +1,4 @@
-package org.petproject.socialnetwork.Exceptions;
+package org.petproject.socialnetwork.Enums;
 
 import lombok.Getter;
 
@@ -14,7 +14,8 @@ public enum ErrorMessages {
     FOLLOW_ALREADY_EXISTS("Already following."),
     POST_DOES_NOT_EXIST("Post does not exist."),
     ROLE_NOT_FOUND("Role not found."),
-    ILLEGAL_ARGUMENT("User use wrong args.");
+    ILLEGAL_ARGUMENT("User use wrong args."),
+    NOTIFICATION_NOT_FOUND("Notification not found");
 
 
     private final String message;
