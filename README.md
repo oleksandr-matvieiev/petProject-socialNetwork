@@ -252,6 +252,24 @@ image=postImage.jpg (optional)
 bio=New bio (optional)
 newPicture=newProfileImage.jpg (optional)
 ```
+### Follow Management
+
+**1. Follow user**
+
+- Follow another user: ```POST /api/follow/{followeeUsername}```
+ 
+**2. Unfollow User**
+- Unfollow user you followed:
+```DELETE /api/follow/{followeeUsername}```
+
+**3. Get user's followers**
+- Get list of user's followers:
+```GET /api/follow/{username}/followers```
+
+**4. Get user's following**
+- Get list of user's following:
+```GET /api/follow/{username}/following```
+
 ## API Security
 - **JWT Authentication**: Secure all endpoints (except for login, registration) with JWT tokens.
 - **Role-Based Access Control**:Ensure role-specific access
