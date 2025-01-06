@@ -45,6 +45,12 @@ public class FollowService {
         logger.info("User {} successfully followed user {}.", follower.getUsername(), followee.getUsername());
         return followMapper.toDTO(followRepository.save(follow));
     }
+    public void unfollowUser(User follower, User followee) {
+        Follow follow = followRepository.findByFollowerAndFollowee(follower, followee)
+                .orElseThrow(() -> new IllegalArgument("Follow relationship does not exist."));
+        followRepository.delete(follow);
+    }
+
 
     public List<FollowDTO> getFollowers(User user) {
         return followRepository.findByFollowee(user).stream()
