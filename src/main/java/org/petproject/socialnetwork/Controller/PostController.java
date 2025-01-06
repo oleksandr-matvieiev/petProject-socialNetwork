@@ -56,8 +56,8 @@ public class PostController {
 
     @GetMapping("/userPosts/{username}")
     public ResponseEntity<List<PostDTO>> getPostsByUser(@PathVariable String username) {
-        UserDTO userDTO = authenticationService.findUserByUsername(username);
-        List<PostDTO> posts = postService.getPostsByUser(userMapper.toEntity(userDTO));
+        User user = authenticationService.findUserByUsername(username);
+        List<PostDTO> posts = postService.getPostsByUser(user);
         return ResponseEntity.ok(posts);
     }
 

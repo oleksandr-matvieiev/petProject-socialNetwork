@@ -148,10 +148,9 @@ public class AuthenticationService {
                 .orElseThrow(UserNotFound::new);
     }
 
-    public UserDTO findUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
+    public  User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(UserNotFound::new);
-        return userMapper.toDTO(user);
     }
 
 }
