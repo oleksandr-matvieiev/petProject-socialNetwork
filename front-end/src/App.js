@@ -8,6 +8,7 @@ import UserProfile from "./Components/UserProfile";
 import MessagesPage from "./Components/MessagesPage";
 import VerifyEmailPage from "./Components/VerifyEmailPage";
 import EditProfilePage from "./Components/EditProfilePage";
+import NotificationsPage from "./Components/NotificationsPage";
 
 function App() {
     return (
@@ -27,6 +28,8 @@ function App() {
                     <Route path={"/verify-email"} element={<VerifyEmailPage/>}/>
 
                     <Route path={"/profile/edit"} element={<EditProfilePage/>}/>
+
+                    <Route path={"/notifications"} element={<NotificationsPage/>}/>
                 </Routes>
             </div>
         </Router>

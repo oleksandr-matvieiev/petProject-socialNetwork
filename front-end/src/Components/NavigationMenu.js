@@ -44,6 +44,9 @@ const NavigationMenu = () => {
                     {username&&(
                         <Link to={`/post/create`}>Create Post</Link>
                     )}
+                    {username&&(
+                        <Link to={`/notifications`}>Notifications</Link>
+                    )}
                 </ul>
             </nav>
             {username && (
