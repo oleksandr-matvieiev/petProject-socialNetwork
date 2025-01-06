@@ -60,6 +60,10 @@ public class DataInitializer implements CommandLineRunner {
 
             Role superAdminRole = roleRepository.findByName(RoleName.SUPER_ADMIN)
                     .orElseThrow(() -> new RoleNotFound("Super Admin role not found"));
+            Role adminRole = roleRepository.findByName(RoleName.ADMIN)
+                    .orElseThrow(() -> new RoleNotFound("Admin role not found"));
+            Role userRole = roleRepository.findByName(RoleName.USER)
+                    .orElseThrow(() -> new RoleNotFound("User role not found"));
 
             superAdmin.setRoles(Set.of(superAdminRole));
             userRepository.save(superAdmin);
