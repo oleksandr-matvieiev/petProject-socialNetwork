@@ -6,11 +6,13 @@ const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const apiBaseUrl = 'http://localhost:8080/api/notifications';
+
     const token = localStorage.getItem('Token');
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/api/notifications",
+                const response = await axios.get(`${apiBaseUrl}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -29,7 +31,7 @@ const NotificationsPage = () => {
 
     const markAsRead = async (notificationId) => {
         try {
-            await axios.post(`http://localhost:8080/api/notifications/${notificationId}/read`,{},
+            await axios.post(`${apiBaseUrl}/${notificationId}/read`, {},
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -44,6 +46,22 @@ const NotificationsPage = () => {
             console.error("Error marking notification as read:", error);
         }
     };
+    const markAllAsRead = async () => {
+        try {
+            await axios.post(`${apiBaseUrl}/readAll`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setNotifications((prevNotifications) =>
+                prevNotifications.map((notification) =>
+                    notification.id ? {...notification, read: true} : notification
+                )
+            );
+        } catch (error) {
+            console.error("Error marking all notifications as read: ", error)
+        }
+    };
 
     if (loading) return <p>Loading notifications...</p>;
 
@@ -55,6 +73,7 @@ const NotificationsPage = () => {
                 <p>No notifications yet.</p>
             ) : (
                 <ul className="notifications-list">
+                    <button onClick={() => markAllAsRead()}>Mark all as Read</button>
                     {notifications.map((notification) => (
                         <li key={notification.id}
                             className={`notification-item ${notification.read ? "read" : "unread"}`}>
