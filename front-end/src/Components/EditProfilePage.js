@@ -20,7 +20,7 @@ const EditProfilePage = () => {
             formData.append('newPicture', profilePicture);
         }
 
-        const token = localStorage.getItem('Token');
+        const token = localStorage.getItem('token');
 
         try {
             const response = await axios.post(

@@ -8,7 +8,7 @@ const NotificationsPage = () => {
 
     const apiBaseUrl = 'http://localhost:8080/api/notifications';
 
-    const token = localStorage.getItem('Token');
+    const token = localStorage.getItem('token');
     useEffect(() => {
         const fetchNotifications = async () => {
             try {

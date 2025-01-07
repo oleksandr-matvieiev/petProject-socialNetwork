@@ -22,7 +22,7 @@ const AuthPage = () => {
             const Token = response.data.token;
 
             if (Token) {
-                localStorage.setItem('Token', Token);
+                localStorage.setItem('token', Token);
                 localStorage.setItem('username', username);
                 setError(null);
                 alert("Login successful!")
@@ -68,11 +68,11 @@ const AuthPage = () => {
     };
 
     const isAuthenticated = () => {
-        return !!localStorage.getItem('Token');
+        return !!localStorage.getItem('token');
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('Token');
+        localStorage.removeItem('token');
         localStorage.removeItem('roles');
         localStorage.removeItem('username')
         alert('Logged out successfully.');

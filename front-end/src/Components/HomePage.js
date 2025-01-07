@@ -38,7 +38,7 @@ const HomePage = () => {
         }
     };
     const addComment = async (postId) => {
-        const token = localStorage.getItem("Token");
+        const token = localStorage.getItem("token");
         try {
             const response = await axios.post(
                 `http://localhost:8080/api/posts/${postId}/addComment`,
@@ -57,7 +57,7 @@ const HomePage = () => {
 
 
     const toggleLike = async (postId) => {
-        const token = localStorage.getItem('Token');
+        const token = localStorage.getItem('token');
         try {
             const response = await axios.post(
                 `http://localhost:8080/api/posts/${postId}/like`,

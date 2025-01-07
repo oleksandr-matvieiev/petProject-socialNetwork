@@ -14,7 +14,7 @@ const UserProfile = () => {
     const navigate = useNavigate();
     const apiBaseUrl = 'http://localhost:8080/api';
     const currentUsername = localStorage.getItem('username');
-    const token = localStorage.getItem('Token');
+    const token = localStorage.getItem('token');
 
     const handleFollowToggle = async () => {
         try {

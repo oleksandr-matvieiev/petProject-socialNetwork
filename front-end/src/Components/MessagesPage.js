@@ -20,7 +20,7 @@ const MessagesPage = () => {
     }, []);
 
     const fetchChats = async () => {
-        const token = localStorage.getItem("Token");
+        const token = localStorage.getItem("token");
         try {
             const response = await axios.get(`${apiBaseUrl}/chats`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -32,7 +32,7 @@ const MessagesPage = () => {
     };
 
     const fetchCurrentUser = async () => {
-        const token = localStorage.getItem("Token");
+        const token = localStorage.getItem("token");
         try {
             const response = await axios.get(`${apiBaseUrl}/auth/me`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -44,7 +44,7 @@ const MessagesPage = () => {
     };
 
     const fetchConversation = async (receiverUsername) => {
-        const token = localStorage.getItem("Token");
+        const token = localStorage.getItem("token");
         try {
             const response = await axios.get(`${apiBaseUrl}/messages/conversation/${receiverUsername}`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -67,7 +67,7 @@ const MessagesPage = () => {
     };
 
     const createNewChat = async () => {
-        const token = localStorage.getItem("Token");
+        const token = localStorage.getItem("token");
         if (!receiver) {
             alert("Please enter a username to start a chat.");
             return;
@@ -86,7 +86,7 @@ const MessagesPage = () => {
     };
 
     const sendMessage = async () => {
-        const token = localStorage.getItem("Token");
+        const token = localStorage.getItem("token");
         if (!receiver || !content) {
             alert("Please enter a receiver and a message.");
             return;
