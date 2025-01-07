@@ -1,9 +1,9 @@
 package org.petproject.socialnetwork.Controller;
 
 import org.petproject.socialnetwork.DTO.NotificationDTO;
-import org.petproject.socialnetwork.Service.NotificationService;
-import org.petproject.socialnetwork.Service.AuthenticationService;
 import org.petproject.socialnetwork.Model.User;
+import org.petproject.socialnetwork.Service.AuthenticationService;
+import org.petproject.socialnetwork.Service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +31,13 @@ public class NotificationController {
     @PostMapping("/{notificationId}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable Long notificationId) {
         notificationService.markAsRead(notificationId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/readAll")
+    public ResponseEntity<Void> markAllAsRead() {
+        User currentUser = authenticationService.getCurrentUser();
+        notificationService.markAllAsRead(currentUser);
         return ResponseEntity.noContent().build();
     }
 

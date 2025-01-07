@@ -22,7 +22,7 @@ public class NotificationService {
         this.notificationMapper = notificationMapper;
     }
 
-    public NotificationDTO createNotification(User recipient, User triggerUser, NotificationType type, String message) {
+    public void createNotification(User recipient, User triggerUser, NotificationType type, String message) {
         Notification notification = new Notification();
         notification.setRecipient(recipient);
         notification.setTriggerUser(triggerUser);
@@ -30,7 +30,7 @@ public class NotificationService {
         notification.setMessage(message);
 
         notification = notificationRepository.save(notification);
-        return notificationMapper.toDTO(notification);
+        notificationMapper.toDTO(notification);
     }
 
     public List<NotificationDTO> getNotifications(User recipient) {
@@ -45,5 +45,12 @@ public class NotificationService {
         notification.setRead(true);
         notificationRepository.save(notification);
     }
+
+    public void markAllAsRead(User recipient) {
+        List<Notification> notifications = notificationRepository.findByRecipient(recipient);
+        notifications.forEach(notification -> notification.setRead(true));
+        notificationRepository.saveAll(notifications);
+    }
+
 
 }
