@@ -10,6 +10,7 @@ import VerifyEmailPage from "./Components/VerifyEmailPage";
 import EditProfilePage from "./Components/EditProfilePage";
 import NotificationsPage from "./Components/NotificationsPage";
 import AdminDashboardPage from "./Components/AdminDashboardPage";
+import SendEmailPage from "./Components/SendEmailPage";
 
 function App() {
     return (
@@ -33,6 +34,8 @@ function App() {
                     <Route path={"/notifications"} element={<NotificationsPage/>}/>
 
                     <Route path={"/admin/dashboard"} element={<AdminDashboardPage/>}/>
+
+                    <Route path={"/admin/send-email"} element={<SendEmailPage/>}/>
 
                 </Routes>
             </div>
