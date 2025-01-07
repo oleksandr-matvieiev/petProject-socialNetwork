@@ -9,6 +9,7 @@ import MessagesPage from "./Components/MessagesPage";
 import VerifyEmailPage from "./Components/VerifyEmailPage";
 import EditProfilePage from "./Components/EditProfilePage";
 import NotificationsPage from "./Components/NotificationsPage";
+import AdminDashboardPage from "./Components/AdminDashboardPage";
 
 function App() {
     return (
@@ -30,6 +31,9 @@ function App() {
                     <Route path={"/profile/edit"} element={<EditProfilePage/>}/>
 
                     <Route path={"/notifications"} element={<NotificationsPage/>}/>
+
+                    <Route path={"/admin/dashboard"} element={<AdminDashboardPage/>}/>
+
                 </Routes>
             </div>
         </Router>
