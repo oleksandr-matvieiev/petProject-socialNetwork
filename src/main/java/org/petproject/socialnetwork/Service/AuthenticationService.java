@@ -50,7 +50,13 @@ public class AuthenticationService {
         this.emailService = emailService;
         this.userMapper = userMapper;
     }
+    public User getCurrentUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
 
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+    }
     @Transactional
     public UserDTO registerUser(String username, String email, String bio, String password, MultipartFile image) throws IOException {
         if (username == null || username.isBlank()) {

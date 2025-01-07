@@ -3,6 +3,7 @@ package org.petproject.socialnetwork.Controller;
 import jakarta.validation.Valid;
 import org.petproject.socialnetwork.DTO.LoginRequest;
 import org.petproject.socialnetwork.DTO.UserDTO;
+import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,13 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-
 
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
@@ -32,8 +33,6 @@ public class AuthenticationController {
     ) throws IOException {
         UserDTO registeredUser = authenticationService.registerUser(username, email, bio, password, image);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
-
-
     }
 
     @PostMapping("/verify-email")
@@ -55,12 +54,16 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authenticationService.login(loginRequest);
-        return ResponseEntity.ok(Map.of("token", token));
+        User user = authenticationService.getCurrentUserDetails();
+        List<String> roles = user.getRoles().stream()
+                .map(role -> "ROLE_" + role.getName().name())
+                .toList();
+        return ResponseEntity.ok(Map.of("token", token, "roles", roles));
     }
 
     @GetMapping("/me")
     public ResponseEntity<String> getCurrentUser() {
         String username = authenticationService.getCurrentUser().getUsername();
-        return ResponseEntity.ok("username" + username);
+        return ResponseEntity.ok("username: " + username);
     }
 }
