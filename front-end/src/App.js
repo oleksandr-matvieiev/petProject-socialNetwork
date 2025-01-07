@@ -11,6 +11,7 @@ import EditProfilePage from "./Components/EditProfilePage";
 import NotificationsPage from "./Components/NotificationsPage";
 import AdminDashboardPage from "./Components/AdminDashboardPage";
 import SendEmailPage from "./Components/SendEmailPage";
+import UnauthorizedPage from "./Components/UnauthorizedPage";
 
 function App() {
     return (
@@ -25,17 +26,19 @@ function App() {
 
                     <Route path={"/profile/:username"} element={<UserProfile/>}/>
 
+                    <Route path={"/profile/edit"} element={<EditProfilePage/>}/>
+
                     <Route path={"/messages"} element={<MessagesPage/>}/>
 
                     <Route path={"/verify-email"} element={<VerifyEmailPage/>}/>
-
-                    <Route path={"/profile/edit"} element={<EditProfilePage/>}/>
 
                     <Route path={"/notifications"} element={<NotificationsPage/>}/>
 
                     <Route path={"/admin/dashboard"} element={<AdminDashboardPage/>}/>
 
                     <Route path={"/admin/send-email"} element={<SendEmailPage/>}/>
+
+                    <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
                 </Routes>
             </div>
