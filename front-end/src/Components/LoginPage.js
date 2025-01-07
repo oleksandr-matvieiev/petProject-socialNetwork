@@ -3,7 +3,7 @@ import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import NavigationMenu from "./NavigationMenu";
 
-const AuthPage = () => {
+const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
@@ -18,14 +18,17 @@ const AuthPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${apiBaseUrl}/login`, {username, password});
-            const Token = response.data.token;
+            const response = await axios.post(`${apiBaseUrl}/login`, { username, password });
+            const token = response.data.token;
+            const roles = response.data.roles;
 
-            if (Token) {
-                localStorage.setItem('token', Token);
-                localStorage.setItem('username', username);
+            if (token) {
+                localStorage.setItem('token', token); // Save token
+                localStorage.setItem('roles', JSON.stringify(roles)); // Save roles as JSON
+                localStorage.setItem('username', username); // Save username
+                console.log("Roles saved:", roles);
                 setError(null);
-                alert("Login successful!")
+                alert("Login successful!");
                 navigate("/");
             } else {
                 setError('Invalid response from server. No token provided.');
@@ -45,11 +48,12 @@ const AuthPage = () => {
             formData.append("password", password);
             formData.append("bio", bio);
             if (profilePhoto) {
-                formData.append("image", profilePhoto)
+                formData.append("image", profilePhoto);
             }
+
             const response = await axios.post(`${apiBaseUrl}/register`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
                 },
             });
             console.log('Registration successful:', response.data);
@@ -60,7 +64,6 @@ const AuthPage = () => {
 
             localStorage.setItem('emailToVerify', email);
             navigate('/verify-email');
-
         } catch (err) {
             console.error('Registration failed:', err);
             setError('Registration failed. Please try again.');
@@ -72,18 +75,17 @@ const AuthPage = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('roles');
-        localStorage.removeItem('username')
+        localStorage.clear();
         alert('Logged out successfully.');
+        navigate('/login');
     };
 
     return (
         <div>
-            <NavigationMenu/>
+            <NavigationMenu />
             <h1>{isRegistering ? 'Register' : 'Login'}</h1>
 
-            {error && <p style={{color: 'red'}}>{error}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <form onSubmit={isRegistering ? handleRegister : handleLogin}>
                 <input
@@ -109,18 +111,18 @@ const AuthPage = () => {
                 {isRegistering && (
                     <input
                         type="text"
-                        placeholder={"Enter your bio"}
+                        placeholder="Enter your bio"
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
-                    />)}
+                    />
+                )}
                 {isRegistering && (
-
                     <input
                         type="file"
-                        placeholder="Upload your profile foto"
+                        placeholder="Upload your profile photo"
                         onChange={(e) => setProfilePhoto(e.target.files[0])}
-                    />)}
-
+                    />
+                )}
                 <button type="submit">{isRegistering ? 'Register' : 'Login'}</button>
             </form>
 
@@ -129,7 +131,7 @@ const AuthPage = () => {
             </button>
 
             {isAuthenticated() && (
-                <button onClick={handleLogout} style={{marginTop: '10px'}}>
+                <button onClick={handleLogout} style={{ marginTop: '10px' }}>
                     Logout
                 </button>
             )}
@@ -137,4 +139,4 @@ const AuthPage = () => {
     );
 };
 
-export default AuthPage;
+export default LoginPage;
