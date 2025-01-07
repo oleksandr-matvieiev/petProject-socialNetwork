@@ -3,7 +3,6 @@ package org.petproject.socialnetwork.Controller;
 import org.petproject.socialnetwork.DTO.CommentDTO;
 import org.petproject.socialnetwork.DTO.LikeDTO;
 import org.petproject.socialnetwork.DTO.PostDTO;
-import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.Post;
 import org.petproject.socialnetwork.Model.User;
@@ -25,7 +24,6 @@ import java.util.Map;
 public class PostController {
     private final PostService postService;
     private final AuthenticationService authenticationService;
-    private final UserMapper userMapper;
     private final LikeService likeService;
     private final CommentService commentService;
 
@@ -33,7 +31,6 @@ public class PostController {
         this.postService = postService;
         this.likeService = likeService;
         this.authenticationService = authenticationService;
-        this.userMapper = userMapper;
         this.commentService = commentService;
     }
 

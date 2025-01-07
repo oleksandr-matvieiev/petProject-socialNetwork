@@ -11,8 +11,6 @@ import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.LikeRepository;
 import org.petproject.socialnetwork.Repository.PostRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

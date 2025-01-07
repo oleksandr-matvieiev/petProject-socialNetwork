@@ -30,7 +30,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("roles", formattedRoles) // Додаємо ролі
+                .claim("roles", formattedRoles)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
