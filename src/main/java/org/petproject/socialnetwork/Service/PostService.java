@@ -90,5 +90,10 @@ public class PostService {
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    public List<PostDTO> getPostsByUsername(String username) {
+        return postRepository.findByUserUsername(username).stream()
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }
     

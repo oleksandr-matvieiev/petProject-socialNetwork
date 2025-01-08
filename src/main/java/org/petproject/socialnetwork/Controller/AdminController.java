@@ -1,10 +1,12 @@
 package org.petproject.socialnetwork.Controller;
 
+import org.petproject.socialnetwork.DTO.PostDTO;
 import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Enums.RoleName;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Service.AuthenticationService;
 import org.petproject.socialnetwork.Service.EmailService;
+import org.petproject.socialnetwork.Service.PostService;
 import org.petproject.socialnetwork.Service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +18,13 @@ import java.util.Map;
 @RequestMapping("/api/admin")
 public class AdminController {
     public final EmailService emailService;
+    private final PostService postService;
     public final UserService userService;
     public final AuthenticationService authenticationService;
 
-    public AdminController(EmailService emailService, UserService userService, AuthenticationService authenticationService) {
+    public AdminController(EmailService emailService, PostService postService, UserService userService, AuthenticationService authenticationService) {
         this.emailService = emailService;
+        this.postService = postService;
         this.userService = userService;
         this.authenticationService = authenticationService;
     }
@@ -59,15 +63,28 @@ public class AdminController {
 
     @PostMapping("/actions/promote/{username}")
     public ResponseEntity<User> promoteUser(@PathVariable String username, @RequestParam String roleName) {
-        RoleName role=RoleName.valueOf(roleName);
+        RoleName role = RoleName.valueOf(roleName);
         User updatedUser = userService.promoteToRole(username, role);
         return ResponseEntity.ok(updatedUser);
     }
+
     @PostMapping("/actions/demote/{username}")
     public ResponseEntity<User> demoteUser(@PathVariable String username, @RequestParam String roleName) {
-        RoleName role=RoleName.valueOf(roleName);
+        RoleName role = RoleName.valueOf(roleName);
         User updatedUser = userService.demoteFromRole(username, role);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping("/actions/posts/{username}")
+    public ResponseEntity<List<PostDTO>> getUserPosts(@PathVariable String username) {
+        List<PostDTO> posts = postService.getPostsByUsername(username);
+        return ResponseEntity.ok(posts);
+    }
+
+    @DeleteMapping("/actions/posts/{username}/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable String username, @PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
     }
 
 }
