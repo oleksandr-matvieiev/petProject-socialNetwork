@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate, useParams} from "react-router-dom";
+import NavigationMenu from "../NavigationMenu";
 
 const UserPostsPage = () => {
     const {username} = useParams();
@@ -42,6 +43,7 @@ const UserPostsPage = () => {
 
     return (
         <div>
+            <NavigationMenu />
             <h1>{username}'s Posts</h1>
             {posts.length === 0 ? (
                 <p>No posts found.</p>
