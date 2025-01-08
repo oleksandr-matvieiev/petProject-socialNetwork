@@ -2,10 +2,14 @@ package org.petproject.socialnetwork.Service;
 
 import org.petproject.socialnetwork.DTO.UserDTO;
 import org.petproject.socialnetwork.Enums.FileCategory;
+import org.petproject.socialnetwork.Enums.RoleName;
 import org.petproject.socialnetwork.Exceptions.IllegalArgument;
+import org.petproject.socialnetwork.Exceptions.RoleNotFound;
 import org.petproject.socialnetwork.Exceptions.UserNotFound;
 import org.petproject.socialnetwork.Mapper.UserMapper;
+import org.petproject.socialnetwork.Model.Role;
 import org.petproject.socialnetwork.Model.User;
+import org.petproject.socialnetwork.Repository.RoleRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +26,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
+    private final RoleRepository roleRepository;
     private final EmailService emailService;
     private final FileStorageService fileStorageService;
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(UserRepository userRepository, PasswordEncoder encoder, UserMapper userMapper, EmailService emailService, FileStorageService fileStorageService) {
+    public UserService(UserRepository userRepository, PasswordEncoder encoder, UserMapper userMapper, RoleRepository roleRepository, EmailService emailService, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.userMapper = userMapper;
+        this.roleRepository = roleRepository;
         this.emailService = emailService;
         this.fileStorageService = fileStorageService;
     }
@@ -92,6 +98,26 @@ public class UserService {
         User user = userRepository.findByUsername(userUsername)
                 .orElseThrow(UserNotFound::new);
         emailService.sendEmail(user.getEmail(), subject, message);
+    }
+
+    public User promoteToRole(String username, RoleName newRole) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFound::new);
+        Role role = roleRepository.findByName(newRole)
+                .orElseThrow(RoleNotFound::new);
+        user.getRoles().add(role);
+        userRepository.save(user);
+        return user;
+    }
+
+    public User demoteFromRole(String username, RoleName roleName) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
+
+        user.getRoles().remove(role);
+        return userRepository.save(user);
     }
 
 }

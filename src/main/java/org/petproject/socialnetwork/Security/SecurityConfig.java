@@ -49,6 +49,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll()
                         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers("api/admin/actions/promote/{username}").hasRole("SUPERADMIN")
+                        .requestMatchers("api/admin/actions/demote/{username}").hasRole("SUPERADMIN")
                         .requestMatchers("/api/posts/createPost").hasRole("USER")
                         .requestMatchers("/api/posts/allPosts").permitAll()
                         .requestMatchers("/api/posts/userPosts/**").permitAll()

@@ -1,6 +1,8 @@
 package org.petproject.socialnetwork.Controller;
 
 import org.petproject.socialnetwork.DTO.UserDTO;
+import org.petproject.socialnetwork.Enums.RoleName;
+import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Service.AuthenticationService;
 import org.petproject.socialnetwork.Service.EmailService;
 import org.petproject.socialnetwork.Service.UserService;
@@ -53,6 +55,19 @@ public class AdminController {
         String content = requestBody.get("content");
         userService.sendEmailToUser(username, subject, content);
         return ResponseEntity.ok("Email sent successfully.");
+    }
+
+    @PostMapping("/actions/promote/{username}")
+    public ResponseEntity<User> promoteUser(@PathVariable String username, @RequestParam String roleName) {
+        RoleName role=RoleName.valueOf(roleName);
+        User updatedUser = userService.promoteToRole(username, role);
+        return ResponseEntity.ok(updatedUser);
+    }
+    @PostMapping("/actions/demote/{username}")
+    public ResponseEntity<User> demoteUser(@PathVariable String username, @RequestParam String roleName) {
+        RoleName role=RoleName.valueOf(roleName);
+        User updatedUser = userService.demoteFromRole(username, role);
+        return ResponseEntity.ok(updatedUser);
     }
 
 }
