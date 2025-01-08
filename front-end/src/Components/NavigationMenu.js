@@ -4,13 +4,16 @@ import './NavigationMenu.css';
 
 const NavigationMenu = () => {
     const [username, setUsername] = useState(null);
+    const [roles, setRoles] = useState([]);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const storedUsername = localStorage.getItem('username');
+        const storedRoles = JSON.parse(localStorage.getItem('roles')) || [];
         setUsername(storedUsername);
-    });
+        setRoles(storedRoles);
+    },[]);
 
     const handleLogout = () => {
         localStorage.removeItem('roles');
@@ -26,26 +29,29 @@ const NavigationMenu = () => {
                     <li>
                         <Link to="/">Home</Link>
                     </li>
-                    {username&& (
+                    {username && (
                         <li>
                             <Link to="/messages">Messages</Link>
                         </li>
                     )}
                     {username && (
                         <li>
-                        <Link to={`/profile/${username}`}>Profile</Link>
+                            <Link to={`/profile/${username}`}>Profile</Link>
                         </li>
                     )}
-                    {!username&&(
+                    {!username && (
                         <li>
                             <Link to={`/login`}>Registration / Login</Link>
                         </li>
                     )}
-                    {username&&(
+                    {username && (
                         <Link to={`/post/create`}>Create Post</Link>
                     )}
-                    {username&&(
+                    {username && (
                         <Link to={`/notifications`}>Notifications</Link>
+                    )}
+                    {roles.includes("ROLE_ADMIN")&&(
+                        <Link to={`/admin/dashboard`}>Admin dashboard</Link>
                     )}
                 </ul>
             </nav>
