@@ -12,6 +12,8 @@ import NotificationsPage from "./Components/Users/NotificationsPage";
 import AdminDashboardPage from "./Components/Admin/AdminDashboardPage";
 import SendEmailPage from "./Components/Admin/SendEmailPage";
 import UnauthorizedPage from "./Components/Auth/UnauthorizedPage";
+import UsersListPage from "./Components/Admin/UsersListPage";
+import AdminActionsPage from "./Components/Admin/AdminActionsPage";
 
 function App() {
     return (
@@ -40,6 +42,9 @@ function App() {
 
                     <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+                    <Route path="/admin/users" element={<UsersListPage />} />
+
+                    <Route path="/admin/actions/:username" element={<AdminActionsPage />} />
                 </Routes>
             </div>
         </Router>
