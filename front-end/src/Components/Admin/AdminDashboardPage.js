@@ -1,5 +1,6 @@
 import React, {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
+import NavigationMenu from "../NavigationMenu";
 
 const AdminDashboardPage = () => {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ const AdminDashboardPage = () => {
     }
     return (
         <div style={{padding: "20px"}}>
+            <NavigationMenu />
             <h1 style={{textAlign: "center", marginBottom: "30px"}}>Admin Dashboard</h1>
             <div style={{display: "flex", flexDirection: "column", gap: "20px", alignItems: "center"}}>
                 <button
@@ -59,7 +61,7 @@ const AdminDashboardPage = () => {
                         fontSize: "18px",
                     }}
                 >
-                    Check Logs
+                    Check Logs. In develop
                 </button>
             </div>
         </div>

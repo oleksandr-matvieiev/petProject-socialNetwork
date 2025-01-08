@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import axios from "axios";
-import NavigationMenu from "./NavigationMenu";
+import NavigationMenu from "../NavigationMenu";
 
 const CreatePostPage = () => {
     const [posts, setPosts] = useState([]);

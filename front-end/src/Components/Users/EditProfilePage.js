@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import NavigationMenu from './NavigationMenu';
+import NavigationMenu from '../NavigationMenu';
 
 const EditProfilePage = () => {
     const [bio, setBio] = useState('');

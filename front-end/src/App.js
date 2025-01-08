@@ -1,17 +1,17 @@
 import React from "react";
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import './App.css';
-import HomePage from "./Components/HomePage";
-import LoginPage from "./Components/LoginPage";
-import CreatePostPage from "./Components/CreatePostPage";
-import UserProfile from "./Components/UserProfile";
-import MessagesPage from "./Components/MessagesPage";
-import VerifyEmailPage from "./Components/VerifyEmailPage";
-import EditProfilePage from "./Components/EditProfilePage";
-import NotificationsPage from "./Components/NotificationsPage";
-import AdminDashboardPage from "./Components/AdminDashboardPage";
-import SendEmailPage from "./Components/SendEmailPage";
-import UnauthorizedPage from "./Components/UnauthorizedPage";
+import HomePage from "./Components/Posts/HomePage";
+import LoginPage from "./Components/Auth/LoginPage";
+import CreatePostPage from "./Components/Posts/CreatePostPage";
+import UserProfile from "./Components/Users/UserProfile";
+import MessagesPage from "./Components/Messages/MessagesPage";
+import VerifyEmailPage from "./Components/Auth/VerifyEmailPage";
+import EditProfilePage from "./Components/Users/EditProfilePage";
+import NotificationsPage from "./Components/Users/NotificationsPage";
+import AdminDashboardPage from "./Components/Admin/AdminDashboardPage";
+import SendEmailPage from "./Components/Admin/SendEmailPage";
+import UnauthorizedPage from "./Components/Auth/UnauthorizedPage";
 
 function App() {
     return (

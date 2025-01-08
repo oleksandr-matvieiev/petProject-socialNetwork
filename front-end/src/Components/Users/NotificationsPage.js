@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import NavigationMenu from "./NavigationMenu";
+import NavigationMenu from "../NavigationMenu";
 
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);

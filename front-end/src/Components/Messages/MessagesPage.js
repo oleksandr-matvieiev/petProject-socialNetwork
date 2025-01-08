@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './MessagePage.css';
-import NavigationMenu from "./NavigationMenu";
+import NavigationMenu from "../NavigationMenu";
 
 
 const MessagesPage = () => {

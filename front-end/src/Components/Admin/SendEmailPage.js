@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import NavigationMenu from "../NavigationMenu";
 
 const SendEmailPage = () => {
     const [subject, setSubject] = useState("");
@@ -35,6 +36,7 @@ const SendEmailPage = () => {
 
     return (
         <div style={{ padding: "20px" }}>
+            <NavigationMenu />
             <h1>Send Email to All Users</h1>
             <form onSubmit={handleSubmit} style={{ maxWidth: "600px", margin: "0 auto" }}>
                 <div style={{ marginBottom: "20px" }}>
