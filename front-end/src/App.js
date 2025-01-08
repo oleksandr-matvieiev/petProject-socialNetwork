@@ -14,6 +14,7 @@ import SendEmailPage from "./Components/Admin/SendEmailPage";
 import UnauthorizedPage from "./Components/Auth/UnauthorizedPage";
 import UsersListPage from "./Components/Admin/UsersListPage";
 import AdminActionsPage from "./Components/Admin/AdminActionsPage";
+import UserPostsPage from "./Components/Admin/UserPostsPage";
 
 function App() {
     return (
@@ -40,11 +41,13 @@ function App() {
 
                     <Route path={"/admin/send-email"} element={<SendEmailPage/>}/>
 
-                    <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                    <Route path="/unauthorized" element={<UnauthorizedPage/>}/>
 
-                    <Route path="/admin/users" element={<UsersListPage />} />
+                    <Route path="/admin/users" element={<UsersListPage/>}/>
 
-                    <Route path="/admin/actions/:username" element={<AdminActionsPage />} />
+                    <Route path="/admin/actions/:username" element={<AdminActionsPage/>}/>
+
+                    <Route path="/admin/actions/posts/:username" element={<UserPostsPage/>}/>
                 </Routes>
             </div>
         </Router>

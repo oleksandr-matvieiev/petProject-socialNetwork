@@ -90,6 +90,9 @@ const AdminActionsPage = () => {
     const handleViewAccount = () => {
         navigate(`/profile/${username}`);
     };
+    const handleViewUserPosts = () => {
+        navigate(`/admin/actions/posts/${username}`);
+    }
 
     return (
         <div>
@@ -126,6 +129,9 @@ const AdminActionsPage = () => {
             <button onClick={handlePromote}>Promote</button>
             <button onClick={handleDemote}>Demote</button>
             {message && <p>{message}</p>}
+
+            <h1>Interaction with user's posts</h1>
+            <button onClick={handleViewUserPosts}>To user's posts</button>
         </div>
     );
 };
