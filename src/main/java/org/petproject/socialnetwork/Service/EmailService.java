@@ -20,16 +20,18 @@ public class EmailService {
 
     public void sendVerificationEmail(String to, String code) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(to);
-            message.setSubject("Email verification");
-            message.setText("Your verification code is:" + code);
-            mailSender.send(message);
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(to);
+            mailMessage.setSubject("Email verification");
+            mailMessage.setText("Your verification code is:" + code);
+            mailSender.send(mailMessage);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
+
+    //admin usage
     public void sendEmailToAllUsers(String subject, String messageText) {
         List<User> users = userRepository.findAll();
         try {
@@ -40,6 +42,18 @@ public class EmailService {
                 mailMessage.setText(messageText);
                 mailSender.send(mailMessage);
             }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void sendEmail(String to, String subject, String messageText) {
+        try {
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(to);
+            mailMessage.setSubject(subject);
+            mailMessage.setText(messageText);
+            mailSender.send(mailMessage);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

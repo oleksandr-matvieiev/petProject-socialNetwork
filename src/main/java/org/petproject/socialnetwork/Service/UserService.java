@@ -14,19 +14,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder encoder;
     private final UserMapper userMapper;
+    private final PasswordEncoder encoder;
+    private final EmailService emailService;
     private final FileStorageService fileStorageService;
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(UserRepository userRepository, PasswordEncoder encoder, UserMapper userMapper, FileStorageService fileStorageService) {
+    public UserService(UserRepository userRepository, PasswordEncoder encoder, UserMapper userMapper, EmailService emailService, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.userMapper = userMapper;
+        this.emailService = emailService;
         this.fileStorageService = fileStorageService;
     }
 
@@ -67,5 +71,27 @@ public class UserService {
         userMapper.toDTO(userRepository.save(user));
     }
 
+    public List<UserDTO> getAllUsers(String search) {
+        if (search == null || search.isBlank()) {
+            return userRepository.findAll().stream()
+                    .map(userMapper::toDTO)
+                    .collect(Collectors.toList());
+        }
+        return userRepository.findByUsernameContainingIgnoreCase(search).stream()
+                .map(userMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteUserByUsername(String username) {
+        User userToDelete = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFound::new);
+        userRepository.delete(userToDelete);
+    }
+
+    public void sendEmailToUser(String userUsername, String subject, String message) {
+        User user = userRepository.findByUsername(userUsername)
+                .orElseThrow(UserNotFound::new);
+        emailService.sendEmail(user.getEmail(), subject, message);
+    }
 
 }

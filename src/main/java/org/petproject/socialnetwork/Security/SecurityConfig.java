@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll()
-                        .requestMatchers("/api/admin/send-email-to-all").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
                         .requestMatchers("/api/posts/createPost").hasRole("USER")
                         .requestMatchers("/api/posts/allPosts").permitAll()
                         .requestMatchers("/api/posts/userPosts/**").permitAll()
