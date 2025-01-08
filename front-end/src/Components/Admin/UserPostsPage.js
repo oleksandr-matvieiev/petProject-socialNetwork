@@ -8,7 +8,6 @@ const UserPostsPage = () => {
 
     const apiBaseUrl = 'http://localhost:8080/api/admin';
     const token = localStorage.getItem('token');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPosts = async () => {
