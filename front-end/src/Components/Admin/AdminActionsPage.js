@@ -6,12 +6,15 @@ import NavigationMenu from "../NavigationMenu";
 const AdminActionsPage = () => {
     const {username} = useParams();
     const [user, setUser] = useState(null);
+    const [roleName, setRoleName] = useState("ROLE_USER");
     const [emailContent, setEmailContent] = useState('');
     const [emailSubject, setEmailSubject] = useState('');
+    const [message, setMessage] = useState("");
+
     const navigate = useNavigate();
 
     const apiBaseUrl = 'http://localhost:8080/api/admin';
-const token=localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         fetchUser();
@@ -19,7 +22,7 @@ const token=localStorage.getItem('token');
 
     const fetchUser = async () => {
         try {
-            const response = await axios.get(`${apiBaseUrl}/actions/view-account-info/{username}`, {
+            const response = await axios.get(`${apiBaseUrl}/actions/view-account-info/${username}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -60,6 +63,29 @@ const token=localStorage.getItem('token');
             console.error('Error sending email:', err);
         }
     };
+    const handlePromote = async () => {
+        try {
+            const response = await axios.post(`${apiBaseUrl}/actions/promote/${username}`, null, {
+                params: {roleName},
+                headers: {Authorization: `Bearer ${token}`}
+            });
+            setMessage(`User promoted to ${roleName}`);
+        } catch (error) {
+            setMessage("Error promoting user: " + error.message);
+        }
+    };
+
+    const handleDemote = async () => {
+        try {
+            const response = await axios.post(`${apiBaseUrl}/actions/demote/${username}`, null, {
+                params: {roleName},
+                headers: {Authorization: `Bearer ${token}`}
+            });
+            setMessage(`User demoted from ${roleName}`);
+        } catch (error) {
+            setMessage("Error demoting user: " + error.message);
+        }
+    };
 
     const handleViewAccount = () => {
         navigate(`/profile/${username}`);
@@ -67,7 +93,7 @@ const token=localStorage.getItem('token');
 
     return (
         <div>
-            <NavigationMenu />
+            <NavigationMenu/>
             <h1>Actions for {username}</h1>
             {user && (
                 <div>
@@ -91,6 +117,15 @@ const token=localStorage.getItem('token');
             </div>
             <button onClick={handleViewAccount}>View Account</button>
             <button onClick={handleDelete}>Delete Account</button>
+
+            <h1>Promoting</h1>
+            <select value={roleName} onChange={(e) => setRoleName(e.target.value)}>
+                <option value="USER">User</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+            <button onClick={handlePromote}>Promote</button>
+            <button onClick={handleDemote}>Demote</button>
+            {message && <p>{message}</p>}
         </div>
     );
 };
