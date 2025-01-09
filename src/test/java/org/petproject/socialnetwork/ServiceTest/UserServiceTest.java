@@ -6,13 +6,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.petproject.socialnetwork.DTO.UserDTO;
+import org.petproject.socialnetwork.Enums.FileCategory;
+import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Exceptions.UserNotFound;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.User;
+import org.petproject.socialnetwork.Repository.RoleRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
+import org.petproject.socialnetwork.Service.EmailService;
+import org.petproject.socialnetwork.Service.FileStorageService;
 import org.petproject.socialnetwork.Service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,12 +30,16 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
+    @Mock
+    private UserMapper userMapper;
     @Mock
     private PasswordEncoder encoder;
     @Mock
-    private UserMapper userMapper;
-
+    private RoleRepository roleRepository;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private FileStorageService fileStorageService;
     @InjectMocks
     private UserService userService;
 
@@ -35,6 +47,61 @@ class UserServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
+
+    @Test
+    void changeAccountInfo_Success() throws IOException {
+        User user = new User();
+        user.setUsername("test");
+        user.setBio("Old bio");
+        String newBio = "New test bio";
+        MultipartFile mockFile = mock(MultipartFile.class);
+
+        when(fileStorageService.saveImage(mockFile, FileCategory.PROFILE_IMAGE)).thenReturn("imageUrl");
+        when(userRepository.save(user)).thenReturn(user);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername("test");
+        userDTO.setBio(newBio);
+        userDTO.setProfilePicture("imageUrl");
+
+        when(userMapper.toDTO(user)).thenReturn(userDTO);
+
+        UserDTO result = userService.changeAccountInfo(user, newBio, mockFile);
+
+        assertNotNull(result);
+        assertEquals(newBio, result.getBio());
+        assertEquals("imageUrl", result.getProfilePicture());
+    }
+
+    @Test
+    void changeAccountInfo_NullUser() {
+        MultipartFile mockFile = mock(MultipartFile.class);
+        assertThrows(UserNotFound.class, () -> userService.changeAccountInfo(null, "bio", mockFile));
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void changeAccountInfo_EmptyBioAndPicture() throws IOException {
+        User user = new User();
+        user.setUsername("test");
+        MultipartFile emptyFile = mock(MultipartFile.class);
+
+        when(emptyFile.isEmpty()).thenReturn(true);
+        when(userRepository.save(user)).thenReturn(user);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername("test");
+
+        when(userMapper.toDTO(user)).thenReturn(userDTO);
+
+        UserDTO result = userService.changeAccountInfo(user, "", emptyFile);
+
+        assertNotNull(result);
+        verifyNoInteractions(fileStorageService);
+        verify(userRepository, times(1)).save(user);
+    }
+
 
     @Test
     void findUserByUsernameOrThrow_UserExists() {
@@ -119,7 +186,7 @@ class UserServiceTest {
 
     @Test
     void changePassword_NullUser() {
-        assertThrows(IllegalArgumentException.class, () -> userService.changePassword(null, "newPassword"));
+        assertThrows(IllegalArgument.class, () -> userService.changePassword(null, "newPassword"));
         verify(userRepository, never()).save(any());
     }
 
@@ -128,7 +195,25 @@ class UserServiceTest {
         User user = new User();
         user.setUsername("testUser");
 
-        assertThrows(IllegalArgumentException.class, () -> userService.changePassword(user, ""));
+        assertThrows(IllegalArgument.class, () -> userService.changePassword(user, ""));
         verify(userRepository, never()).save(any());
     }
+    @Test
+    void getAllUsers_NoSearchTerm() {
+        User mockUser = new User();
+        mockUser.setUsername("user1");
+        when(userRepository.findAll()).thenReturn(Collections.singletonList(mockUser));
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername("user1");
+        when(userMapper.toDTO(mockUser)).thenReturn(userDTO);
+
+        var result = userService.getAllUsers(null);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("user1", result.getFirst().getUsername());
+        verify(userRepository, times(1)).findAll();
+    }
+
 }
