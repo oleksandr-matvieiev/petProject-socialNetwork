@@ -7,21 +7,26 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.petproject.socialnetwork.DTO.LoginRequest;
 import org.petproject.socialnetwork.DTO.UserDTO;
+import org.petproject.socialnetwork.Enums.FileCategory;
+import org.petproject.socialnetwork.Enums.RoleName;
 import org.petproject.socialnetwork.Exceptions.UserAlreadyExists;
 import org.petproject.socialnetwork.Exceptions.UserWithEmailAlreadyExists;
 import org.petproject.socialnetwork.Mapper.UserMapper;
 import org.petproject.socialnetwork.Model.Role;
-import org.petproject.socialnetwork.Model.RoleName;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.RoleRepository;
 import org.petproject.socialnetwork.Repository.UserRepository;
 import org.petproject.socialnetwork.Security.JwtTokenProvider;
 import org.petproject.socialnetwork.Service.AuthenticationService;
+import org.petproject.socialnetwork.Service.EmailService;
+import org.petproject.socialnetwork.Service.FileStorageService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -42,8 +47,12 @@ public class AuthenticationServiceTest {
     private JwtTokenProvider jwtTokenProvider;
     @Mock
     private AuthenticationManager authenticationManager;
+    @Mock
+    private FileStorageService fileStorageService;
+    @Mock
+    private EmailService emailService;
     @InjectMocks
-    private AuthenticationService registrationService;
+    private AuthenticationService authenticationService;
 
     @BeforeEach
     void setUp() {
@@ -51,18 +60,21 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    void registerUser_Success() {
-        String username = "testUsername";
+    void registerUser_Success() throws IOException {
+        String username = "testUser";
         String email = "test@example.com";
-        String password = "testPass";
+        String password = "password123";
+        String bio = "Test bio";
+        MultipartFile mockFile = mock(MultipartFile.class);
 
         Role role = new Role();
-        role.setName(RoleName.ROLE_USER);
+        role.setName(RoleName.USER);
 
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(userRepository.existsByEmail(email)).thenReturn(false);
-        when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(Optional.of(role));
+        when(roleRepository.findByName(RoleName.USER)).thenReturn(Optional.of(role));
         when(passwordEncoder.encode(password)).thenReturn("encodedPassword");
+        when(fileStorageService.saveImage(mockFile, FileCategory.PROFILE_IMAGE)).thenReturn("imageUrl");
 
         User savedUser = new User();
         savedUser.setId(1L);
@@ -79,7 +91,7 @@ public class AuthenticationServiceTest {
 
         when(userMapper.toDTO(savedUser)).thenReturn(userDTO);
 
-        UserDTO result = registrationService.registerUser(username, email, password);
+        UserDTO result = authenticationService.registerUser(username, email, bio, password, mockFile);
 
         assertNotNull(result);
         assertEquals(username, result.getUsername());
@@ -87,29 +99,34 @@ public class AuthenticationServiceTest {
         assertTrue(savedUser.getRoles().contains(role));
 
         verify(userRepository, times(1)).save(any(User.class));
+        verify(emailService, times(1)).sendVerificationEmail(eq(email), anyString());
     }
 
 
     @Test
     void registerUser_UsernameAlreadyExists() {
-        String username = "existingUser";
+        String username = "testUser";
         String email = "test@example.com";
-        String password = "password";
+        String password = "password123";
+        String bio = "Test bio";
+        MultipartFile mockFile = mock(MultipartFile.class);
 
         when(userRepository.existsByUsername(username)).thenReturn(true);
 
-        assertThrows(UserAlreadyExists.class, () -> registrationService.registerUser(username, email, password));
+        assertThrows(UserAlreadyExists.class, () -> authenticationService.registerUser(username, email, bio, password, mockFile));
     }
 
     @Test
     void registerUser_EmailAlreadyExists() {
         String username = "testUser";
-        String email = "existing@example.com";
-        String password = "password";
+        String email = "test@example.com";
+        String password = "password123";
+        String bio = "Test bio";
+        MultipartFile mockFile = mock(MultipartFile.class);
 
         when(userRepository.existsByEmail(email)).thenReturn(true);
 
-        assertThrows(UserWithEmailAlreadyExists.class, () -> registrationService.registerUser(username, email, password));
+        assertThrows(UserWithEmailAlreadyExists.class, () -> authenticationService.registerUser(username, email, bio, password, mockFile));
     }
 
     @Test
@@ -126,12 +143,39 @@ public class AuthenticationServiceTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authenticationMock);
 
-        when(jwtTokenProvider.generateToken(username)).thenReturn(expectedToken);
-        String token = registrationService.login(loginRequest);
+        User user = new User();
+        user.setUsername(username);
+        user.setEmailVerified(true);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(jwtTokenProvider.generateToken(eq(username), any())).thenReturn(expectedToken);
+        String token = authenticationService.login(loginRequest);
 
         assertEquals(expectedToken, token);
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtTokenProvider, times(1)).generateToken(username);
+        verify(jwtTokenProvider, times(1)).generateToken(eq(username),any());
+    }
+
+    @Test
+    void login_EmailNotVerified() {
+        String username = "testUser";
+        String password = "testPassword";
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername(username);
+        loginRequest.setPassword(password);
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmailVerified(false);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                authenticationService.login(loginRequest)
+        );
+        assertEquals("Email is not verified", exception.getMessage());
+        verifyNoInteractions(jwtTokenProvider);
     }
 
     @Test
@@ -146,7 +190,7 @@ public class AuthenticationServiceTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new RuntimeException("Bad credentials"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> registrationService.login(loginRequest));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> authenticationService.login(loginRequest));
         assertEquals("Bad credentials", exception.getMessage());
 
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
