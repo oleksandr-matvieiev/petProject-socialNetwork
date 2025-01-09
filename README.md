@@ -13,6 +13,7 @@ functionalities including role-based access, user registration and login, creati
 - **JWT-based Security**: Role-based access control with JWT for authentication.
 - **Image Upload**: Ability to upload and attach posts and user profile images.
 - **Messaging**: Ability to create chats with another users and send them messages.
+- **Admin Management:** Manage users, posts, and roles via admin APIs.
 
 ## Technologies
 
@@ -89,6 +90,68 @@ npm start
 - Access to the front-end is available at: http://localhost:3000
 
 ## Usage
+
+### Admin Management
+The ```AdminController``` enables administrative features like managing users, posts, and roles.
+
+1. **Send Email to All Users**
+- Send an email to all registered users:  
+```POST /api/admin/send-email-to-all```
+- Request Parameters:
+
+```
+subject: Email subject
+message: Email message
+```
+
+2. **Get All Users**
+- Retrieve all users or search by username/email:  
+```GET /api/admin/get-all-users```
+- Request Parameters:
+```
+search (optional): {A keyword to filter users}
+```
+3. **View Account Info**
+- Get detailed account info for a specific user:  
+```GET /api/admin/actions/view-account-info/{username}```
+
+4. **Delete Account**
+- Delete a user's account by username:  
+```DELETE /api/admin/actions/delete-account/{username}```
+
+5. **Send Email to a User**
+- Send an email to a specific user:  
+```POST /api/admin/actions/send-email/{username}```
+- Request Body (JSON):
+
+```json
+{
+  "subject": "Your Subject",
+  "content": "Your message content"
+}
+```
+6. **Promote User**
+- Promote a user to a specific role:  
+```POST /api/admin/actions/promote/{username}```
+- Request Parameters:
+```
+roleName: {Role to assign} (e.g., ADMIN).
+```
+7. **Demote User**
+- Demote a user from a specific role:  
+```POST /api/admin/actions/demote/{username}```
+- Request Parameters:
+
+```
+roleName: {Role to remove} (e.g., ADMIN).
+```
+8. **View User Posts**
+- Retrieve all posts created by a specific user:  
+```GET /api/admin/actions/posts/{username}```
+
+9. **Delete User Post**
+- Delete a specific post by its ID:  
+```DELETE /api/admin/actions/posts/{username}/{postId}```
 
 ### User Authentication
 
@@ -274,5 +337,5 @@ newPicture=newProfileImage.jpg (optional)
 - **JWT Authentication**: Secure all endpoints (except for login, registration) with JWT tokens.
 - **Role-Based Access Control**:Ensure role-specific access
 - **User**: Can browse posts, likes and comments them, make chats with another users and send them messages, edit profile...(in develop).
-- **Admin**: In develop.
-- **Super Admin**: In develop.
+- **Admin**: Can send email to every user and to chosen user, get list of all users(also using search filter),view every users info, delete user's account, view and delete user posts...(in develop).
+- **Super Admin**: All from admin, promote and demote user roles...(in develop).
