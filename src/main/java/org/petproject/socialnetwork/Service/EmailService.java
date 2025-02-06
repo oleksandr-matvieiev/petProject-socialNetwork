@@ -23,7 +23,7 @@ public class EmailService {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(to);
             mailMessage.setSubject("Email verification");
-            mailMessage.setText("Your verification code is:" + code);
+            mailMessage.setText("Your verification code is: " + code);
             mailSender.send(mailMessage);
         } catch (Exception e) {
             System.out.println(e.getMessage());
