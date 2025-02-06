@@ -6,11 +6,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.petproject.socialnetwork.DTO.FollowDTO;
+import org.petproject.socialnetwork.Exceptions.IllegalArgument;
 import org.petproject.socialnetwork.Mapper.FollowMapper;
 import org.petproject.socialnetwork.Model.Follow;
 import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.FollowRepository;
 import org.petproject.socialnetwork.Service.FollowService;
+import org.petproject.socialnetwork.Service.NotificationService;
 
 import java.util.Optional;
 
@@ -24,6 +26,8 @@ public class FollowServiceTest {
 
     @Mock
     private FollowMapper followMapper;
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private FollowService followService;
@@ -66,7 +70,7 @@ public class FollowServiceTest {
 
         when(followRepository.findByFollowerAndFollowee(follower, followee)).thenReturn(Optional.of(follow));
 
-        assertThrows(IllegalArgumentException.class, () -> followService.followUser(follower, followee));
+        assertThrows(IllegalArgument.class, () -> followService.followUser(follower, followee));
         verify(followRepository, never()).save(any(Follow.class));
     }
 }

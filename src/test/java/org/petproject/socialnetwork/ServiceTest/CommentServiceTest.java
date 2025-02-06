@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.petproject.socialnetwork.DTO.CommentDTO;
+import org.petproject.socialnetwork.Exceptions.PostNotFound;
 import org.petproject.socialnetwork.Mapper.CommentMapper;
 import org.petproject.socialnetwork.Model.Comment;
 import org.petproject.socialnetwork.Model.Post;
@@ -13,6 +14,7 @@ import org.petproject.socialnetwork.Model.User;
 import org.petproject.socialnetwork.Repository.CommentRepository;
 import org.petproject.socialnetwork.Repository.PostRepository;
 import org.petproject.socialnetwork.Service.CommentService;
+import org.petproject.socialnetwork.Service.NotificationService;
 
 import java.util.List;
 
@@ -23,6 +25,8 @@ class CommentServiceTest {
 
     @Mock
     private CommentRepository commentRepository;
+    @Mock
+    private NotificationService notificationService;
 
     @Mock
     private PostRepository postRepository;
@@ -80,7 +84,7 @@ class CommentServiceTest {
 
         when(postRepository.existsById(post.getId())).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> commentService.addComment(post, content, user));
+        assertThrows(PostNotFound.class, () -> commentService.addComment(post, content, user));
         verify(commentRepository, never()).save(any(Comment.class));
     }
 

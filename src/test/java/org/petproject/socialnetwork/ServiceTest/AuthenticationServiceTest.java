@@ -174,7 +174,7 @@ public class AuthenticationServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 authenticationService.login(loginRequest)
         );
-        assertEquals("Email is not verified", exception.getMessage());
+        assertEquals("Email not verified", exception.getMessage());
         verifyNoInteractions(jwtTokenProvider);
     }
 

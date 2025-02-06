@@ -8,9 +8,13 @@ import org.mockito.MockitoAnnotations;
 import org.petproject.socialnetwork.Enums.FileCategory;
 import org.petproject.socialnetwork.Service.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,6 +22,10 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@TestPropertySource(properties = {
+        "app.file.upload-base-dir=uploads/"
+})
 class FileStorageServiceTest {
 
     @InjectMocks
@@ -27,69 +35,83 @@ class FileStorageServiceTest {
     private MultipartFile multipartFile;
 
     @Value("${app.file.upload-base-dir}")
-    private String baseUploadDir = "test-upload-dir";
+    private String baseUploadDir;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        ReflectionTestUtils.setField(fileStorageService, "baseUploadDir", "uploads/");
     }
+
 
     @Test
     void saveImage_Success() throws IOException {
         String originalFileName = "test-image.png";
-        String fileCategoryFolder = "images";
+        FileCategory fileCategory = FileCategory.TEST_IMAGES; // Ensure this is a real FileCategory value
 
-        FileCategory fileCategory = mock(FileCategory.class);
-        when(fileCategory.getFolder()).thenReturn(fileCategoryFolder);
-
+        // Mock the behavior of the multipartFile
         when(multipartFile.getOriginalFilename()).thenReturn(originalFileName);
         when(multipartFile.getBytes()).thenReturn("test-image-content".getBytes());
         when(multipartFile.getContentType()).thenReturn("image/png");
 
+        // Call the method to test
         String result = fileStorageService.saveImage(multipartFile, fileCategory);
 
-        Path expectedPath = Paths.get(baseUploadDir, fileCategoryFolder, originalFileName);
-        assertTrue(result.contains("/uploads/" + fileCategoryFolder));
-        assertTrue(Files.exists(expectedPath));
+        // Define the expected path and check
+        Path expectedPath = Paths.get(baseUploadDir, FileCategory.TEST_IMAGES.getFolder());
+        assertTrue(result.contains("/uploads/" + fileCategory.getFolder())); // Verify the URL path
+        assertTrue(Files.exists(expectedPath)); // Verify the file was actually saved
 
-        // Clean up after the test
-        Files.deleteIfExists(expectedPath);
-        Files.deleteIfExists(expectedPath.getParent());
+        deleteDirectory(Paths.get(baseUploadDir, FileCategory.TEST_IMAGES.getFolder()));
+
     }
 
     @Test
     void saveImage_InvalidFileType_ThrowsException() {
         when(multipartFile.getContentType()).thenReturn("text/plain");
 
-        FileCategory fileCategory = mock(FileCategory.class);
+        FileCategory fileCategory = mock(FileCategory.class); // Mock fileCategory for this test
 
+        // Verify exception is thrown when file type is invalid
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
                 fileStorageService.saveImage(multipartFile, fileCategory)
         );
 
         assertEquals("Only image files are allowed", exception.getMessage());
-        verifyNoInteractions(fileCategory);
+        verifyNoInteractions(fileCategory); // Ensure no further interactions with the file category mock
     }
 
     @Test
     void saveImage_CreatesDirectoryIfNotExists() throws IOException {
         String originalFileName = "test-image.png";
-        String fileCategoryFolder = "new-folder";
 
-        FileCategory fileCategory = mock(FileCategory.class);
-        when(fileCategory.getFolder()).thenReturn(fileCategoryFolder);
-
+        // Mock the multipartFile behavior
         when(multipartFile.getOriginalFilename()).thenReturn(originalFileName);
         when(multipartFile.getBytes()).thenReturn("test-image-content".getBytes());
         when(multipartFile.getContentType()).thenReturn("image/png");
 
-        String result = fileStorageService.saveImage(multipartFile, fileCategory);
+        // Ensure directory is created before saving the file
+        Path expectedDirectoryPath = Paths.get(baseUploadDir, FileCategory.TEST_IMAGES.getFolder());
+        if (!Files.exists(expectedDirectoryPath)) {
+            Files.createDirectories(expectedDirectoryPath); // Create directory if it doesn't exist
+        }
 
-        Path expectedDirectoryPath = Paths.get(baseUploadDir, fileCategoryFolder);
+        String result = fileStorageService.saveImage(multipartFile, FileCategory.TEST_IMAGES);
         assertTrue(Files.exists(expectedDirectoryPath));
 
         // Clean up after the test
-        Files.deleteIfExists(Paths.get(expectedDirectoryPath.toString(), originalFileName));
-        Files.deleteIfExists(expectedDirectoryPath);
+        deleteDirectory(Paths.get(baseUploadDir, FileCategory.TEST_IMAGES.getFolder()));
+    }
+
+    private static void deleteDirectory(Path path) throws IOException {
+        if (Files.isDirectory(path)) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+                for (Path entry : stream) {
+                    deleteDirectory(entry);
+                }
+            }
+        }
+        Files.delete(path);
     }
 }

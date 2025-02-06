@@ -27,6 +27,10 @@ public class FileStorageService {
         }
         String folder = fileCategory.getFolder();
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+        System.out.println("Base Upload Dir: " + baseUploadDir);
+        System.out.println("Folder: " + folder);
+
         Path uploadPath = Paths.get(baseUploadDir, folder);
 
         if (!Files.exists(uploadPath)) {
