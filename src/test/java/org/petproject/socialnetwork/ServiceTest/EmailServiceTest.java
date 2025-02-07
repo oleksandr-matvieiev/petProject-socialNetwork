@@ -2,6 +2,7 @@ package org.petproject.socialnetwork.ServiceTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -13,7 +14,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
@@ -30,6 +33,7 @@ public class EmailServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
     @Test
     void sendVerificationEmail_Success() {
         String to = "user@example.com";
@@ -37,12 +41,19 @@ public class EmailServiceTest {
 
         emailService.sendVerificationEmail(to, code);
 
-        verify(mailSender, times(1)).send(argThat((SimpleMailMessage message) ->
-                message.getTo()[0].equals(to) &&
-                        message.getSubject().equals("Email verification") &&
-                        message.getText().equals("Your verification code is:" + code)
-        ));
+        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        verify(mailSender, times(1)).send(messageCaptor.capture());
+
+        SimpleMailMessage sentMessage = messageCaptor.getValue();
+
+        assertNotNull(sentMessage);
+        assertArrayEquals(new String[]{to}, sentMessage.getTo());
+        assertEquals("Email verification", sentMessage.getSubject());
+        assertEquals("Your verification code is: " + code, sentMessage.getText());
+        assertNull(sentMessage.getFrom());
+        assertNull(sentMessage.getReplyTo());
     }
+
     @Test
     void sendEmailToAllUsers_Success() {
         String subject = "Subject for All Users";
