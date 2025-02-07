@@ -28,5 +28,15 @@ services:
       SPRING_DATASOURCE_USERNAME: dbUser
       SPRING_DATASOURCE_PASSWORD: dbPassword
 
+
+  frontend:
+    build: ./front-end
+    container_name: social_network_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
 volumes:
   mysql_data:
