@@ -21,6 +21,8 @@ functionalities including role-based access, user registration and login, creati
 - **Spring Security** with JWT and role-based access control
 - **Spring Data JPA** for data persistence
 - **MySQL** as the database
+- **Docker + Docker Compose** for containerization
+- **React** for frontend 
 - **Jakarta Mail** for email functionality
 - **MultipartFile** for file uploads
 - **JSON Web Token (JWT)** for securing the API authentication
@@ -28,12 +30,15 @@ functionalities including role-based access, user registration and login, creati
 - **MapStruct** for object mapping between DTOs and entities.
 
 ## Requirements
-
 - Java 21
 - Maven 3+
-- MySQL
+- MySQL (if not using Docker)
 - Postman (for testing API endpoints)
 - Frontend client (optional, recommended React)
+
+🔹For Docker Setup (Recommended):
+- Docker
+- Docker Compose
 
 ## Installation and Setup
 
@@ -44,9 +49,7 @@ git clone https://github.com/oleksandr-matvieiev/petProject-socialNetwork.git
 cd petProject-socialNetwork
 ```
 
-### Step 2: Configure Database
-
-1.Edit ```application.properties``` under ```src/main/resources``` with your MySQL database credentials:
+2. Edit ```application.properties``` under ```src/main/resources``` with your MySQL database credentials:
 
   ```
   spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
@@ -69,7 +72,24 @@ Configure email settings in ```application.properties``` to enable account verif
 
 ### Step 4: Run the Application
 
-Use Maven to build and run the project:
+1. Run with Docker(Recommended)
+  ```
+docker-compose up --build
+```
+
+💡 What will happen?
+
+✅ MySQL + Spring Boot + React will start automatically.
+
+✅ No need to manually configure the database.
+
+✅ Open in browser:
+
+Backend: http://localhost:8080
+
+Frontend: http://localhost:3000
+
+2. Use Maven to build and run the project. Alternative Setup (Without Docker):
 
 ```
   mvn clean install
