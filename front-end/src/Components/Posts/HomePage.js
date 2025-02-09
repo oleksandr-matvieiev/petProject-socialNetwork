@@ -1,17 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import './HomePage.css';
 import NavigationMenu from "../NavigationMenu";
 
-
 const HomePage = () => {
     const [posts, setPosts] = useState([]);
+    const [recommendedPosts, setRecommendedPosts] = useState([]);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
     const [comments, setComments] = useState({});
     const [newComment, setNewComment] = useState("");
+    const [showRecommended, setShowRecommended] = useState(false);
     const apiBaseUrl = 'http://localhost:8080/api/posts';
 
     const fetchPosts = async () => {
@@ -27,6 +28,26 @@ const HomePage = () => {
             setLoading(false);
         }
     };
+
+    const fetchRecommendedPosts = async () => {
+        const token = localStorage.getItem("token");
+        setLoading(true);
+        try {
+            const response = await axios.get(`${apiBaseUrl}/recommended`,{
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            });
+            setRecommendedPosts(response.data);
+            setError(null);
+        } catch (err) {
+            console.error('Error fetching recommended posts:', err);
+            setError('Failed to fetch recommended posts. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchComments = async (postId) => {
         try {
             const response = await axios.get(`${apiBaseUrl}/${postId}/comments`);
@@ -37,13 +58,14 @@ const HomePage = () => {
             console.error(`Error fetching comments for post ${postId}:`, err);
         }
     };
+
     const addComment = async (postId) => {
         const token = localStorage.getItem("token");
         try {
             const response = await axios.post(
                 `http://localhost:8080/api/posts/${postId}/addComment`,
-                {content: newComment},
-                {headers: {Authorization: `Bearer ${token}`}}
+                { content: newComment },
+                { headers: { Authorization: `Bearer ${token}` } }
             );
             setComments((prevComments) => ({
                 ...prevComments,
@@ -55,14 +77,13 @@ const HomePage = () => {
         }
     };
 
-
     const toggleLike = async (postId) => {
         const token = localStorage.getItem('token');
         try {
             const response = await axios.post(
                 `http://localhost:8080/api/posts/${postId}/like`,
                 {},
-                {headers: {Authorization: `Bearer ${token}`}}
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
             const updatedPosts = posts.map((post) => {
@@ -82,7 +103,6 @@ const HomePage = () => {
             console.error('Error liking post:', err);
         }
     };
-
 
     const searchPosts = async (username) => {
         if (!username) {
@@ -106,31 +126,43 @@ const HomePage = () => {
         fetchPosts();
     }, []);
 
+    const handleShowRecommended = () => {
+        setShowRecommended(!showRecommended);
+        if (!showRecommended) {
+            fetchRecommendedPosts();
+        }
+    };
+
+    const displayedPosts = showRecommended ? recommendedPosts : posts;
+
     return (
         <div className="page-container">
-            <NavigationMenu/>
+            <NavigationMenu />
             <h1>Welcome to the Home Page</h1>
-            <div style={{marginBottom: '20px'}}>
+            <div style={{ marginBottom: '20px' }}>
                 <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search posts by username"
-                    style={{marginRight: '10px', padding: '5px'}}
+                    style={{ marginRight: '10px', padding: '5px' }}
                 />
-                <button onClick={() => searchPosts(search)} style={{padding: '5px 10px'}}>
+                <button onClick={() => searchPosts(search)} style={{ padding: '5px 10px' }}>
                     Search
+                </button>
+                <button onClick={handleShowRecommended} style={{ padding: '5px 10px', marginLeft: '10px' }}>
+                    {showRecommended ? "Show All Posts" : "Show Recommended Posts"}
                 </button>
             </div>
             {loading && <p>Loading...</p>}
-            {error && <p style={{color: 'red'}}>{error}</p>}
-            {posts.length > 0 ? (
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {displayedPosts.length > 0 ? (
                 <div>
-                    <h2>{search ? `Posts by "${search}"` : "All Posts"}:</h2>
+                    <h2>{search ? `Posts by "${search}"` : (showRecommended ? "Recommended Posts" : "All Posts")}:</h2>
                     <ul>
-                        {posts.map((post) => (
+                        {displayedPosts.map((post) => (
                             <li key={post.id} className="post-item">
-                                <div style={{display: "flex", alignItems: "center", marginBottom: "10px"}}>
+                                <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
                                     <img
                                         src={`http://localhost:8080${post.user.profilePicture}`}
                                         alt={`${post.user.username}'s avatar`}
@@ -143,7 +175,7 @@ const HomePage = () => {
                                     />
                                     <h3>
                                         <Link to={`/profile/${post.user.username}`}
-                                              style={{textDecoration: 'none', color: '#007bff'}}>
+                                              style={{ textDecoration: 'none', color: '#007bff' }}>
                                             {post.user.username}
                                         </Link>
                                     </h3>
@@ -153,25 +185,25 @@ const HomePage = () => {
                                     <img
                                         src={`http://localhost:8080${post.imageUrl}`}
                                         alt="Post"
-                                        style={{maxWidth: '200px', marginTop: '10px'}}
+                                        style={{ maxWidth: '200px', marginTop: '10px' }}
                                     />
                                 )}
                                 <small>Posted on: {new Date(post.createdAt).toLocaleString()}</small>
                                 <button
                                     onClick={() => toggleLike(post.id)}
-                                    style={{marginTop: '10px', padding: '5px 10px'}}
+                                    style={{ marginTop: '10px', padding: '5px 10px' }}
                                 >
                                     {post.likedByCurrentUser ? "Unlike" : "Like"}
                                 </button>
                                 <p>{post.likeCount} {post.likeCount === 1 ? 'like' : 'likes'}</p>
                                 <button
                                     onClick={() => fetchComments(post.id)}
-                                    style={{marginTop: "10px", padding: "5px 10px"}}
+                                    style={{ marginTop: "10px", padding: "5px 10px" }}
                                 >
                                     View Comments
                                 </button>
                                 {comments[post.id] && (
-                                    <ul style={{marginTop: "10px"}}>
+                                    <ul style={{ marginTop: "10px" }}>
                                         {comments[post.id].map((comment) => (
                                             <li key={comment.id}>
                                                 <p>{comment.user.username}: {comment.content}</p>
@@ -185,11 +217,11 @@ const HomePage = () => {
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
                                     placeholder="Add a comment"
-                                    style={{marginTop: "10px", padding: "5px", width: "80%"}}
+                                    style={{ marginTop: "10px", padding: "5px", width: "80%" }}
                                 />
                                 <button
                                     onClick={() => addComment(post.id)}
-                                    style={{padding: "5px 10px", marginTop: "10px"}}
+                                    style={{ padding: "5px 10px", marginTop: "10px" }}
                                 >
                                     Add Comment
                                 </button>
