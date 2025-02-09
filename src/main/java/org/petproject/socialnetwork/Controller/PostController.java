@@ -64,6 +64,13 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/recommended")
+    public ResponseEntity<List<PostDTO>> getRecommendedPosts() {
+        User currentUser = authenticationService.getCurrentUser();
+        List<PostDTO> recommendedPosts = postService.getRecommendedPosts(currentUser.getId());
+        return ResponseEntity.ok(recommendedPosts);
+    }
+
     //Section likes
     @PostMapping("/{postId}/like")
     public ResponseEntity<?> toggleLike(@PathVariable Long postId) {
@@ -88,6 +95,5 @@ public class PostController {
         List<CommentDTO> commentDTOs = commentService.getCommentsForPost(postId);
         return ResponseEntity.ok(commentDTOs);
     }
-
 
 }

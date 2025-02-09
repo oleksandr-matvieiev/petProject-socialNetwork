@@ -14,10 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +31,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final FileStorageService fileStorageService;
     private final Logger logger = LoggerFactory.getLogger(PostService.class);
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public PostService(PostRepository postRepository, PostMapper postMapper, LikeRepository likeRepository, CommentRepository commentRepository, FileStorageService fileStorageService) {
         this.postRepository = postRepository;
@@ -90,9 +94,30 @@ public class PostService {
                 .map(postMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
     public List<PostDTO> getPostsByUsername(String username) {
         return postRepository.findByUserUsername(username).stream()
                 .map(postMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getRecommendedPosts(Long userId) {
+        List<Long> recommendedPostIds = getRecommendedPostsFromAI(userId);
+        return recommendedPostIds.stream()
+                .map(postRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(postMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    private List<Long> getRecommendedPostsFromAI(Long userId) {
+        String url = "http://localhost:5001/recommend/" + userId;
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        List<?> recommendedPosts = (List<?>) response.get("recommended_posts");
+        return recommendedPosts.stream()
+                .map(id -> ((Integer) id).longValue())
                 .collect(Collectors.toList());
     }
 }
