@@ -11,7 +11,7 @@ services:
       MYSQL_USER: dbUser
       MYSQL_PASSWORD: dbPassword
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
@@ -38,5 +38,21 @@ services:
     ports:
       - "3000:3000"
 
+  flask_ai:
+    build: ./ml
+    container_name: flask_ai
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "5001:5001"
+    environment:
+      FLASK_RUN_HOST: 0.0.0.0
+    networks:
+      - app_network
+
 volumes:
   mysql_data:
+
+networks:
+  app_network:
